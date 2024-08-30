@@ -3,11 +3,13 @@ import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react';
+import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import * as React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import type { NavItemConfig } from '@/types/nav';
+import { useAppSelector } from '../../hooks/hook';
 import { isNavItemActive } from '../../lib/isNavItemActive';
+import { selectCurrentUser } from '../../slices/userSlice';
+import type { NavItemConfig } from '../../types/nav';
 import { navItems } from './config';
 import { navIcons } from './NavIcons';
 
@@ -19,6 +21,7 @@ export interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const location = useLocation();
+  const currentUser = useAppSelector(selectCurrentUser)
   const pathname = location.pathname;
 
   return (
@@ -63,10 +66,9 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
         >
           <Box sx={{ flex: '1 1 auto' }}>
             <Typography color="inherit" variant="subtitle1">
-              Admin
+              {currentUser?.user?.username}
             </Typography>
           </Box>
-          <CaretUpDownIcon />
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
@@ -78,17 +80,20 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
 }
 
 function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
-  const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
-    const { key, children, ...item } = curr;
-
-    acc.push(
-      <NavItem key={key} pathname={pathname} {...item}>
-        {children && renderNavItems({ items: children, pathname })}
-      </NavItem>
-    );
-
-    return acc;
-  }, []);
+  const children = items.map((item) => (
+    <NavItem
+      key={item.key}
+      pathname={pathname}
+      disabled={item.disabled}
+      external={item.external}
+      href={item.href}
+      icon={item.icon}
+      matcher={item.matcher}
+      title={item.title}
+    >
+      {item.children && renderNavItems({ items: item.children, pathname })}
+    </NavItem>
+  ));
 
   return (
     <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
@@ -102,7 +107,7 @@ interface NavItemProps extends Omit<NavItemConfig, 'children'> {
   children?: React.ReactNode;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title, children }: NavItemProps & { children?: React.ReactNode }): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title, children }: NavItemProps): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
@@ -111,18 +116,17 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, chi
     setOpen((prevOpen) => !prevOpen);
   };
 
+  const LinkComponent = external ? 'a' : RouterLink;
+
   return (
     <li>
       <Box
+        component={LinkComponent}
+        to={!external ? href : undefined}
+        href={external ? href : undefined}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noreferrer' : undefined}
         onClick={children ? handleToggle : undefined}
-        {...(href
-          ? {
-            component: external ? 'a' : RouterLink,
-            href,
-            target: external ? '_blank' : undefined,
-            rel: external ? 'noreferrer' : undefined,
-          }
-          : { role: 'button' })}
         sx={{
           alignItems: 'center',
           borderRadius: 1,
@@ -160,7 +164,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, chi
             {title}
           </Typography>
         </Box>
-        {children ? <CaretUpDownIcon /> : null}
+        {children && (open ? <CaretUp /> : <CaretDown />)}
       </Box>
       {open && children ? (
         <Box sx={{ pl: 2 }}>

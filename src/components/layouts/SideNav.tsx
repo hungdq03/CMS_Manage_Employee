@@ -9,10 +9,14 @@ import { isNavItemActive } from '../../lib/isNavItemActive';
 import type { NavItemConfig } from '../../types/nav';
 import { navItems } from './config';
 import { navIcons } from './NavIcons';
+import { CaretDown, CaretUp } from '@phosphor-icons/react';
+import { selectCurrentUser } from '../../slices/userSlice';
+import { useAppSelector } from '../../hooks/hook';
 
 export function SideNav(): React.JSX.Element {
   const location = useLocation();
   const pathname = location.pathname;
+  const currentUser = useAppSelector(selectCurrentUser)
 
   return (
     <Box
@@ -59,10 +63,10 @@ export function SideNav(): React.JSX.Element {
               component="span"
               sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px' }}
             >
-              Admin
+              {currentUser?.user?.username}
+
             </Typography>
           </Box>
-          <CaretUpDownIcon />
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
@@ -74,17 +78,20 @@ export function SideNav(): React.JSX.Element {
 }
 
 function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
-  const children = items.reduce((acc: React.ReactNode[], curr: NavItemConfig): React.ReactNode[] => {
-    const { key, children, ...item } = curr;
-
-    acc.push(
-      <NavItem key={key} pathname={pathname} {...item}>
-        {children && renderNavItems({ items: children, pathname })}
-      </NavItem>
-    );
-
-    return acc;
-  }, []);
+  const children = items.map((item) => (
+    <NavItem
+      key={item.key}
+      pathname={pathname}
+      disabled={item.disabled}
+      external={item.external}
+      href={item.href}
+      icon={item.icon}
+      matcher={item.matcher}
+      title={item.title}
+    >
+      {item.children && renderNavItems({ items: item.children, pathname })}
+    </NavItem>
+  ));
 
   return (
     <Stack component="ul" spacing={1} sx={{ listStyle: 'none', m: 0, p: 0 }}>
@@ -93,14 +100,12 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
   );
 }
 
-
-
 interface NavItemProps extends Omit<NavItemConfig, 'children'> {
   pathname: string;
-  children?: React.ReactNode; 
+  children?: React.ReactNode;
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title, children }: NavItemProps & { children?: React.ReactNode }): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title, children }: NavItemProps): React.JSX.Element {
   const [open, setOpen] = React.useState(false);
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
@@ -109,18 +114,17 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, chi
     setOpen((prevOpen) => !prevOpen);
   };
 
+  const LinkComponent = external ? 'a' : RouterLink;
+
   return (
     <li>
       <Box
+        component={LinkComponent}
+        to={!external ? href : undefined}
+        href={external ? href : undefined}
+        target={external ? '_blank' : undefined}
+        rel={external ? 'noreferrer' : undefined}
         onClick={children ? handleToggle : undefined}
-        {...(href
-          ? {
-              component: external ? 'a' : RouterLink,
-              href,
-              target: external ? '_blank' : undefined,
-              rel: external ? 'noreferrer' : undefined,
-            }
-          : { role: 'button' })}
         sx={{
           alignItems: 'center',
           borderRadius: 1,
@@ -158,7 +162,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, chi
             {title}
           </Typography>
         </Box>
-        {children ? <CaretUpDownIcon /> : null}
+        {children && (open ? <CaretUp /> : <CaretDown />)}
       </Box>
       {open && children ? (
         <Box sx={{ pl: 2 }}>
@@ -168,4 +172,3 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, chi
     </li>
   );
 }
-
