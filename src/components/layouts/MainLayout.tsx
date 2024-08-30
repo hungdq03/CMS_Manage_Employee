@@ -1,19 +1,16 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import GlobalStyles from '@mui/material/GlobalStyles';
-
-import { MainNav } from './MainNav';
-import { SideNav } from './SideNav';
+import * as React from 'react';
 import { Fragment } from 'react';
 import { Outlet } from 'react-router-dom';
-
-
+import { MainNav } from './MainNav';
+import { SideNav } from './SideNav';
 
 export default function MainLayout(): React.JSX.Element {
   return (
     <Fragment>
-     <GlobalStyles
+      <GlobalStyles
         styles={{
           body: {
             '--MainNav-height': '56px',
@@ -39,7 +36,7 @@ export default function MainLayout(): React.JSX.Element {
           <MainNav />
           <main>
             <Container maxWidth="xl" sx={{ py: '64px' }}>
-              <Outlet/>
+              <Outlet />
             </Container>
           </main>
         </Box>

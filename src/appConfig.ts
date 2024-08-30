@@ -1,7 +1,9 @@
+const APPLICATION_PATH = "/";
 
-const APPLICATION_PATH = "/"; 
-module.exports = Object.freeze({
+const config = Object.freeze({
   ROOT_PATH: APPLICATION_PATH,
-  ACTIVE_LAYOUT: "layout1", 
-  API_ENPOINT: "http://training-api.oceantech.com.vn/cms/api",
+  ACTIVE_LAYOUT: "layout1",
+  API_ENDPOINT: "https://em-v2.oceantech.com.vn/em/",
 });
+
+export default config;
