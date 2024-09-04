@@ -7,9 +7,9 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { z as zod } from 'zod';
+import { useAppContext } from '../../context/AppContext';
 import { useAppDispatch, useAppSelector } from '../../hooks/hook';
 import { selectAuth, signIn } from '../../slices/authSlice'; // Đảm bảo import đúng slice và action
-import { useAppContext } from '../../context/AppContext';
 
 const schema = zod.object({
   username: zod.string().min(1, { message: 'Hãy nhập tên đăng nhập' }),

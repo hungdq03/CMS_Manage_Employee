@@ -2,16 +2,15 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { CaretUpDown as CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
+import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import * as React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { useAppSelector } from '../../hooks/hook';
 import { isNavItemActive } from '../../lib/isNavItemActive';
+import { selectCurrentUser } from '../../slices/userSlice';
 import type { NavItemConfig } from '../../types/nav';
 import { navItems } from './config';
 import { navIcons } from './NavIcons';
-import { CaretDown, CaretUp } from '@phosphor-icons/react';
-import { selectCurrentUser } from '../../slices/userSlice';
-import { useAppSelector } from '../../hooks/hook';
 
 export function SideNav(): React.JSX.Element {
   const location = useLocation();

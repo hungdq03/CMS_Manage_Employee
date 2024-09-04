@@ -1,21 +1,18 @@
-import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit'
-import authReducer from '../slices/authSlice'
-import employeeReducer from '../slices/employeesSlice'
-import userReducer from '../slices/userSlice'
+import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
+import authReducer from '../slices/authSlice';
+import employeeReducer from '../slices/employeesSlice';
+import userReducer from '../slices/userSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     auth: authReducer,
-    employees: employeeReducer
+    employees: employeeReducer,
   },
-})
+});
 
-// Infer the type of `store`
-export type AppStore = typeof store
-// Infer the `AppDispatch` type from the store itself
-export type AppDispatch = typeof store.dispatch
-// Same for the `RootState` type
-export type RootState = ReturnType<typeof store.getState>
-// Export a reusable type for handwritten thunks
-export type AppThunk = ThunkAction<void, RootState, unknown, Action>
+// Export type
+export type AppStore = typeof store;
+export type AppDispatch = typeof store.dispatch;
+export type RootState = ReturnType<typeof store.getState>;
+export type AppThunk = ThunkAction<void, RootState, unknown, Action>;

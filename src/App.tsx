@@ -1,13 +1,14 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import AuthGuard from './features/auth/AuthGuard';
 import { ThemeProvider } from './components/core/themeProvider/ThemeProvider';
 import MainLayout from './components/layouts/MainLayout';
+import { AppContextProvider } from './context/AppContext';
+import AuthGuard from './features/auth/AuthGuard';
 import { SignInPage } from './features/auth/SignInPage';
 import ManageEmployeesPage from './features/employees/manageEmployees/ManageEmployeesPage';
 import { store } from './hooks/store';
-import { AppContextProvider } from './context/AppContext';
+import { paths } from './paths'
 
 const App: React.FC = () => {
   return (
@@ -17,9 +18,9 @@ const App: React.FC = () => {
           <Router>
             <AuthGuard>
               <Routes>
-                <Route path="/sign-in" element={<SignInPage />} />
-                <Route path="/" element={<MainLayout />}>
-                  <Route path="/employees/manageEmployees" element={<ManageEmployeesPage />} />
+                <Route path={paths.auth.signIn} element={<SignInPage />} />
+                <Route path={paths.home} element={<MainLayout />}>
+                  <Route path={paths.dashboard.employees.manage} element={<ManageEmployeesPage />} />
                 </Route>
               </Routes>
             </AuthGuard>
