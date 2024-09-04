@@ -1,4 +1,4 @@
-import { House } from '@phosphor-icons/react';
+import { Hourglass, House, SuitcaseSimple, UserCircleGear, UserCircleMinus, UserCirclePlus } from '@phosphor-icons/react';
 import type { Icon } from '@phosphor-icons/react/dist/lib/types';
 import { BuildingOffice, UserList } from '@phosphor-icons/react/dist/ssr';
 import { ChartPie as ChartPieIcon } from '@phosphor-icons/react/dist/ssr/ChartPie';
@@ -13,9 +13,15 @@ export const navIcons = {
   'gear-six': GearSixIcon,
   'plugs-connected': PlugsConnectedIcon,
   'x-square': XSquare,
-  home : House,
+  home: House,
   leader: BuildingOffice,
-  manager: UserList,
+  manager: UserCircleGear,
   user: UserIcon,
   users: UsersIcon,
+  'add-employee': UserCirclePlus,
+  'manage-employees': UserList,
+  'fired-employee': UserCircleMinus,
+  'pending-approval': Hourglass,
+  'approved': SuitcaseSimple
+
 } as Record<string, Icon>;

@@ -6,7 +6,6 @@ import { Fragment } from 'react';
 import { Outlet } from 'react-router-dom';
 import { MainNav } from './MainNav';
 import { SideNav } from './SideNav';
-
 export default function MainLayout(): React.JSX.Element {
   return (
     <Fragment>

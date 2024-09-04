@@ -26,7 +26,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
 
   const handleSignOut = useCallback(async (): Promise<void> => {
     dispatch(signOut());
-    navigate('/login');
+    navigate('/sign-in');
   }, [dispatch, navigate]); // Đảm bảo useCallback phụ thuộc vào navigate
 
 

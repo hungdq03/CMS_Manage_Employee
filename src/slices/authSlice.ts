@@ -4,6 +4,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { fetchCurrentUser } from './userSlice';
 import ConstantList from "../appConfig";
+import { AuthState } from '../types/auth';
 
 // Define interfaces for API responses and state
 interface AuthResponse {
@@ -13,16 +14,6 @@ interface AuthResponse {
   expires_in: number;
   scope: string;
   organization: string;
-}
-
-interface AuthState {
-  accessToken: string | null;
-  refreshToken: string | null;
-  tokenType: string | null;
-  expiresIn: number | null;
-  isAuthenticated: boolean;
-  loading: boolean;
-  error: string | null;
 }
 
 // Initial state for auth
@@ -57,6 +48,10 @@ export const signIn = createAsyncThunk<AuthResponse, { username: string; passwor
       // Save tokens in local storage
       localStorage.setItem('token', response.data.access_token);
 
+      // Save expires time tokens in local storage
+      const expireTime = Date.now() + response.data.expires_in * 1000;
+      localStorage.setItem('token_expire_time', expireTime.toString());
+
       // Fetch user info
       dispatch(fetchCurrentUser());
 
@@ -81,6 +76,7 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = null;
       localStorage.removeItem('token');
+      localStorage.removeItem('token_expire_time');
     },
   },
   extraReducers: (builder) => {
@@ -110,4 +106,6 @@ export default authSlice.reducer;
 
 // Selectors
 export const selectAuth = (state: RootState) => state.auth;
+export const selectAccessToken = (state: RootState) => state.auth.accessToken;
+
 

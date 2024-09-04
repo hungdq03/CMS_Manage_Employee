@@ -12,17 +12,18 @@ interface AuthGuardProps {
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token');
+  const tokenExpireTime = localStorage.getItem('token_expire_time');
 
   useEffect(() => {
-    if (!token) {
+    if (!token || (tokenExpireTime && Date.now() > parseInt(tokenExpireTime, 10))) {
       dispatch(signOut());
-      navigate(`/sign-in`);
+      navigate('/sign-in');
     } else {
       dispatch(fetchCurrentUser());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, dispatch, token]);
+  }, [navigate, dispatch, token, tokenExpireTime]);
 
   return <>{children}</>;
 };
