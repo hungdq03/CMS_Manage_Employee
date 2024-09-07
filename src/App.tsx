@@ -1,35 +1,36 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Provider } from 'react-redux';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { ThemeProvider } from './components/core/themeProvider/ThemeProvider';
+import MainLayout from './components/layouts/MainLayout';
+import { AppContextProvider } from './context/AppContext';
+import AuthGuard from './features/auth/AuthGuard';
+import { SignInPage } from './features/auth/SignInPage';
+import AddEmployeePage from './features/employees/addEmployee/AddEmployeePage';
+import ManageEmployeesPage from './features/employees/manageEmployees/ManageEmployeesPage';
+import { store } from './redux/store';
+import { paths } from './paths';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Provider store={store}>
+      <AppContextProvider>
+        <ThemeProvider>
+          <Router>
+            <AuthGuard>
+              <Routes>
+                <Route path={paths.auth.signIn} element={<SignInPage />} />
+                <Route path={paths.home} element={<MainLayout />}>
+                  <Route path={paths.dashboard.employees.add} element={<AddEmployeePage />} />
+                  <Route path={paths.dashboard.employees.manage} element={<ManageEmployeesPage />} />
+                </Route>
+              </Routes>
+            </AuthGuard>
+          </Router>
+        </ThemeProvider>
+      </AppContextProvider>
+    </Provider>
+  );
+};
 
-export default App
+export default App;
