@@ -6,7 +6,7 @@ import { ClearIcon } from '@mui/x-date-pickers/icons';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import * as React from 'react';
 import { ChangeEvent, useState } from 'react';
-import { paramsSearchEmployees } from '../types/employees';
+import { paramsSearchEmployees } from '../../types/employee';
 interface EmployeesFiltersProps {
   keyword: string;
   onChangeParams: (state: Partial<paramsSearchEmployees>) => void;
@@ -33,6 +33,10 @@ export function EmployeesFilters({ keyword, onChangeParams, onSearch }: Employee
     onChangeParams({ keyword: '' });
     setShowClearIcon("none");
   };
+
+  const handleClickSearch = () => {
+    onSearch();
+  }
 
   return (
     <Card sx={{
@@ -68,7 +72,7 @@ export function EmployeesFilters({ keyword, onChangeParams, onSearch }: Employee
           <InputAdornment position="end">
             <Tooltip title="Tìm kiếm">
               <IconButton
-                onClick={onSearch}
+                onClick={handleClickSearch}
               >
                 <MagnifyingGlassIcon size={24} />
               </IconButton>

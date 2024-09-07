@@ -2,13 +2,14 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Fragment, useEffect, useState } from 'react';
+import EmployeeDialog from '../../../components/employees/dialogs/EmployeeDialog';
 import { EmployeesFilters } from '../../../components/tables/EmployeesFilter';
 import { EmployeesTable } from '../../../components/tables/EmployeesTable';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { fetchEmployeesPage, selectEmployeesState } from '../../../redux/slices/employeesSlice';
 import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../../types/employee';
 
-const ManageEmployeesPage = () => {
+const AddEmployeePage = () => {
   const dispatch = useAppDispatch()
   const { employees, employeeStatus, employeeError } = useAppSelector(selectEmployeesState);
 
@@ -17,13 +18,13 @@ const ManageEmployeesPage = () => {
       pageIndex: 1,
       pageSize: 10,
       keyword: '',
-      listStatus: STATUS_EMPLOYEE.MANAGE
+      listStatus: STATUS_EMPLOYEE.ADD
     }
   )
 
   useEffect(() => {
     fetchData(params);
-  }, []);
+  }, [dispatch]);
 
   const onChangeParams = (partialParams: Partial<paramsSearchEmployees>) => {
     setParams((prevParams) => {
@@ -49,8 +50,9 @@ const ManageEmployeesPage = () => {
       <Stack spacing={3}>
         <Stack direction="row" spacing={3}>
           <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-            <Typography variant="h4">Quản lý nhân viên</Typography>
+            <Typography variant="h4">Thêm mới nhân viên</Typography>
           </Stack>
+          <EmployeeDialog type='ADD' />
         </Stack>
         <EmployeesFilters keyword={params.keyword || ''} onChangeParams={onChangeParams} onSearch={handleSearch} />
         <EmployeesTable
@@ -65,4 +67,4 @@ const ManageEmployeesPage = () => {
   )
 }
 
-export default ManageEmployeesPage
+export default AddEmployeePage

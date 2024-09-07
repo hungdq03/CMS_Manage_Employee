@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { RootState } from '../hooks/store';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { signInAPI } from '../../api/auth';
+import { RootState } from '../store';
+import { AuthState } from '../../types/auth';
 import { fetchCurrentUser } from './userSlice';
-import ConstantList from "../appConfig";
-import { AuthState } from '../types/auth';
+import Cookies from 'js-cookie';
 
 // Define interfaces for API responses and state
 interface AuthResponse {
@@ -32,25 +32,15 @@ export const signIn = createAsyncThunk<AuthResponse, { username: string; passwor
   'auth/sign-in',
   async (credentials, { dispatch, rejectWithValue }) => {
     try {
-      const response = await axios.post(`${ConstantList.API_ENDPOINT}/oauth/token`, new URLSearchParams({
-        client_id: 'core_client',
-        grant_type: 'password',
-        client_secret: 'secret',
-        username: credentials.username,
-        password: credentials.password,
-      }), {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic Y29yZV9jbGllbnQ6c2VjcmV0'
-        }
-      });
+      const response = await signInAPI(credentials.username, credentials.password);
 
-      // Save tokens in local storage
-      localStorage.setItem('token', response.data.access_token);
-
-      // Save expires time tokens in local storage
-      const expireTime = Date.now() + response.data.expires_in * 1000;
-      localStorage.setItem('token_expire_time', expireTime.toString());
+      // Save tokens in cookie
+      Cookies.set('token', response.data.access_token,
+        {
+          expires: response.data.expires_in / 86400,
+          secure: true,
+          sameSite: 'Strict'
+        });
 
       // Fetch user info
       dispatch(fetchCurrentUser());
@@ -75,8 +65,8 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.loading = false;
       state.error = null;
-      localStorage.removeItem('token');
-      localStorage.removeItem('token_expire_time');
+      Cookies.remove('token');
+      // localStorage.removeItem('token_expire_time');
     },
   },
   extraReducers: (builder) => {

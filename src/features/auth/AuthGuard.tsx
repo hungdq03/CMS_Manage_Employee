@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../hooks/hook';
-import { signOut } from '../../slices/authSlice';
-import { fetchCurrentUser } from '../../slices/userSlice';
+import { useAppDispatch } from '../../redux/hook';
+import { signOut } from '../../redux/slices/authSlice';
+import { fetchCurrentUser } from '../../redux/slices/userSlice';
+import Cookies from 'js-cookie';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -12,18 +13,17 @@ interface AuthGuardProps {
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-  const tokenExpireTime = localStorage.getItem('token_expire_time');
+  const token = Cookies.get('token');
 
   useEffect(() => {
-    if (!token || (tokenExpireTime && Date.now() > parseInt(tokenExpireTime, 10))) {
+    if (!token) {
       dispatch(signOut());
       navigate('/sign-in');
     } else {
       dispatch(fetchCurrentUser());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate, dispatch, token, tokenExpireTime]);
+  }, [navigate, dispatch, token]);
 
   return <>{children}</>;
 };

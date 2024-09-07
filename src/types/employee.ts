@@ -1,7 +1,7 @@
 import { Certificate } from "./certificate";
-import { FamilyMember } from "./family";
+import { Family } from "./family";
 
-export interface Employee {
+export type Employee = {
   id: number;
   name: string;
   code: string;
@@ -10,38 +10,39 @@ export interface Employee {
   address: string;
   team: number;
   email: string;
-  image: string;
+  image?: string | null;
   phone: string;
   citizenIdentificationNumber: string;
   dateOfIssuanceCard: number;
   placeOfIssueCard: string;
-  submitDay: number;
-  leaderName: string;
-  leaderPosition: number;
-  submitContent: string;
-  knowledge: string;
-  activity: string;
-  skill: string;
+  submitDay?: number | null;
+  leaderName?: string | null;
+  leaderPosition?: number | null;
+  submitContent?: string | null;
+  knowledge?: string | null;
+  activity?: string | null;
+  skill?: string | null;
   submitProfileStatus: string;
-  currentPosition: string | null;
-  employeeFamilyDtos: FamilyMember[] | null;
-  certificatesDto: Certificate[] | null;
-  ethnic: string;
-  religion: string;
-  appointmentDate: number | null;
-  additionalRequest: string | null;
-  rejectionDate: number | null;
-  reasonForRejection: string | null;
-  additionalRequestTermination: string | null;
-  terminationAppointmentDate: number | null;
-  refuseEndProfileDay: number | null;
-  reasonForRefuseEndProfile: string | null;
-  endDay: number | null;
-  reasonForEnding: string | null;
-  numberSaved: string | null;
-  decisionDay: number | null;
-  leaderId: number;
-}
+  currentPosition?: number | null;
+  employeeFamilyDtos?: Family[] | null;
+  certificatesDto?: Certificate[] | null;
+  ethnic?: string | null;
+  religion?: string | null;
+  appointmentDate?: number | null;
+  additionalRequest?: string | null;
+  rejectionDate?: number | null;
+  reasonForRejection?: string | null;
+  additionalRequestTermination?: string | null;
+  terminationAppointmentDate?: number | null;
+  refuseEndProfileDay?: number | null;
+  reasonForRefuseEndProfile?: string | null;
+  endDay?: number | null;
+  reasonForEnding?: string | null;
+  numberSaved?: string | null;
+  decisionDay?: number | null;
+  leaderId?: number | null;
+};
+
 
 export type paramsSearchEmployees = {
   pageIndex: number;
@@ -133,5 +134,27 @@ export const STATUS_PROFILE: Record<string, string> = {
   9: "Từ chối kết thúc",
 };
 
+export const ACTION_EMPLOYEE = {
+  VIEW: "2, 3,6,8,9",
+  EDIT: "1,4,5,3,8,9",
+  DELETE: "1",
+  NOTIFY: "4,5, 8,9",
+  END: "7",
+  PENDING_END: "6",
+  PENDING: "2",
+};
+
+export const TAB_EMPLOYEE = 0;
+export const TAB_CERTIFICATE = 1;
+export const TAB_FAMILY = 2;
+
+export const TAB_SARALY = 0;
+export const TAB_PROMOTED = 1;
+export const TAB_PROPOSAL = 2;
+
+export const TAB_PENDING_REGISTER = 0;
+export const TAB_PENDING_PROMOTED = 1;
+export const TAB_PENDING_SARALY = 2;
+export const TAB_PENDING_PROPOSAL = 3;
 
 
