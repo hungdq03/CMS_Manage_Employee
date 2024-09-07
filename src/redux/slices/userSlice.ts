@@ -1,8 +1,7 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
-import ConstantList from "../appConfig";
-import { RootState } from '../hooks/store';
-import { User } from '../types/user';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { getCurrentUserAPI } from '../../api/user';
+import { RootState } from '../store';
+import { User } from '../../types/user';
 
 // Define a type for the slice state
 interface UserState {
@@ -23,19 +22,7 @@ export const fetchCurrentUser = createAsyncThunk<User, void>(
   'user/fetchCurrentUser',
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No token found');
-      }
-
-      const response = await axios.get(`${ConstantList.API_ENDPOINT}/api/users/getCurrentUser`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const response = await getCurrentUserAPI()
       return response.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

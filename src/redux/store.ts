@@ -1,13 +1,17 @@
 import { Action, configureStore, ThunkAction } from '@reduxjs/toolkit';
-import authReducer from '../slices/authSlice';
-import employeeReducer from '../slices/employeesSlice';
-import userReducer from '../slices/userSlice';
+import authReducer from './slices/authSlice';
+import employeeReducer from './slices/employeesSlice';
+import userReducer from './slices/userSlice';
+import certificateReducer from './slices/certificateSlice';
+import familyReducer from './slices/familySlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     auth: authReducer,
     employees: employeeReducer,
+    certificate: certificateReducer,
+    family: familyReducer
   },
 });
 

@@ -9,9 +9,9 @@ import { SignOut as SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
 import * as React from 'react';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { signOut } from '../../slices/authSlice';
-import { useAppDispatch, useAppSelector } from '../../hooks/hook';
-import { selectCurrentUser } from '../../slices/userSlice';
+import { signOut } from '../../redux/slices/authSlice';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { selectCurrentUser } from '../../redux/slices/userSlice';
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -27,8 +27,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   const handleSignOut = useCallback(async (): Promise<void> => {
     dispatch(signOut());
     navigate('/sign-in');
-  }, [dispatch, navigate]); // Đảm bảo useCallback phụ thuộc vào navigate
-
+  }, [dispatch, navigate]);
 
   return (
     <Popover
