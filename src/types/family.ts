@@ -1,12 +1,12 @@
 export interface Family {
-  id: number;
-  name: string;
-  gender: number;
-  dateOfBirth: number;
-  relationShip: number;
-  citizenIdentificationNumber: string;
-  address: string;
-  email: string;
-  employeeId: number;
-  phoneNumber: string;
+  id: number | null;
+  name: string | null;
+  gender: number | null;
+  dateOfBirth: number | null;
+  relationShip: number | null;
+  citizenIdentificationNumber: string | null;
+  address: string | null;
+  email: string | null;
+  employeeId: number | null;
+  phoneNumber: string | null;
 }

@@ -1,5 +1,5 @@
 import { Button, Grid, MenuItem } from '@mui/material';
-import React, { ChangeEvent, useEffect, useLayoutEffect, useState, MouseEvent } from 'react'
+import React, { ChangeEvent, useEffect, useLayoutEffect, useState, MouseEvent, useRef } from 'react'
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
 import { GENDER, RELATIONSHIP } from '../../../types/employee';
 import { convertDateStringtoTime, convertTimeToDate, statusCode } from '../../../utils';
@@ -9,7 +9,7 @@ import moment from 'moment';
 import { addAgeValidationRule, addEmailValidationRule, addIdentityCardValidationRule, addPhoneValidationRule, removeAgeValidationRule, removeEmailValidationRule, removeIdentityCardValidationRule, removePhoneValidationRule } from '../../../lib/employeeValidator';
 import { useSelector } from 'react-redux';
 import { createFamilyThunk, selectFamilyState, updateFamilyThunk } from '../../../redux/slices/familySlice';
-import { FamiliesTable } from '../../tables/FamiliesTable';
+import { FamiliesTable } from '../tables/FamiliesTable';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppContext } from '../../../context/AppContext';
 
@@ -21,6 +21,9 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const [family, setFamily] = useState<Family>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formRef = useRef<any>(null);
+
   const [familiesByPage, setFamiliesByPage] = useState<Family[]>([])
   const [pagination, setPagination] = useState(
     {
@@ -72,13 +75,13 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
       if (family?.id) {
         // update employee
         resultAction = await dispatch(updateFamilyThunk(family));
-        successMessage = 'Cập nhật văn bằng thành công.';
-        errorMessage = 'Cập nhật văn bằng thất bại.';
+        successMessage = 'Cập nhật thông tin gia đình thành công.';
+        errorMessage = 'Cập nhật thông tin gia đình thất bại.';
       } else if (family) {
         // create employee
         resultAction = await dispatch(createFamilyThunk({ employeeId: employeeId, families: [family] }));
-        successMessage = 'Thêm văn bằng thành công.';
-        errorMessage = 'Thêm văn bằng thất bại.';
+        successMessage = 'Thêm thông tin gia đình thành công.';
+        errorMessage = 'Thêm thông tin gia đình thất bại.';
       }
 
       if (resultAction) {
@@ -86,6 +89,9 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
 
         if (response.code === statusCode.SUCCESS) {
           setFamily(undefined)
+          if (formRef.current) {
+            formRef.current.resetValidations();
+          }
           showMessage({
             message: successMessage ?? '',
             severity: 'success',
@@ -104,6 +110,7 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
         severity: 'error'
       });
     }
+
   };
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -127,7 +134,7 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
 
   return (
     <>
-      <ValidatorForm onSubmit={handleSubmit}>
+      <ValidatorForm onSubmit={handleSubmit} ref={formRef}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}>
             <TextValidator
@@ -186,7 +193,7 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
                 </span>
               }
               select
-              value={family?.gender}
+              value={family?.gender ?? ''}
               variant="outlined"
               onChange={handleChangeInput}
               className="w-100"
@@ -256,7 +263,7 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
                 </span>
               }
               select
-              value={family?.relationShip}
+              value={family?.relationShip ?? ''}
               variant="outlined"
               onChange={handleChangeInput}
               className="w-100"

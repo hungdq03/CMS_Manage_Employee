@@ -45,7 +45,10 @@ export const deleteCertificateThunk = createAsyncThunk(
   async (certificateId: number, ThunkAPI) => {
     try {
       const response = await deleteCertificate(certificateId);
-      return response.data;
+      return {
+        ...response.data,
+        id: certificateId
+      };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return ThunkAPI.rejectWithValue(error.response.data.message || 'Failed to fetch employees');
@@ -147,7 +150,7 @@ const certificateSlice = createSlice({
       state.certificateError = null;
     });
     builder.addCase(deleteCertificateThunk.fulfilled, (state, action) => {
-      state.certificates.data = state.certificates.data.filter((cert) => cert.id !== action.payload);
+      state.certificates.data = state.certificates.data.filter((cert) => cert.id !== action.payload.id);
       state.certificateStatus = 'succeeded';
     });
     builder.addCase(deleteCertificateThunk.rejected, (state, action) => {
@@ -189,4 +192,4 @@ const certificateSlice = createSlice({
 });
 
 export default certificateSlice.reducer;
-export const selectCertificateState = (state: RootState) => state.certificate
+export const selectCertificateState = (state: RootState) => state.certificates

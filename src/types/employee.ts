@@ -22,7 +22,7 @@ export type Employee = {
   knowledge?: string | null;
   activity?: string | null;
   skill?: string | null;
-  submitProfileStatus: string;
+  submitProfileStatus: number;
   currentPosition?: number | null;
   employeeFamilyDtos?: Family[] | null;
   certificatesDto?: Certificate[] | null;
@@ -124,7 +124,7 @@ export const PROPOSAL_TYPE: Record<number, string> = {
 export const STATUS_PROFILE: Record<string, string> = {
   0: "Nộp lưu",
   1: "Lưu mới",
-  2: "Chờ duyệt",
+  2: "Chờ xử lý",
   3: "Đã duyệt",
   4: "Yêu cầu bổ sung",
   5: "Từ chối",
@@ -148,6 +148,10 @@ export const TAB_EMPLOYEE = 0;
 export const TAB_CERTIFICATE = 1;
 export const TAB_FAMILY = 2;
 
+export const TAB_PROFILE_CV = 0;
+export const TAB_PROFILE_INFORMATION = 1;
+export const TAB_PROFILE_CERTIFICATE = 2;
+
 export const TAB_SARALY = 0;
 export const TAB_PROMOTED = 1;
 export const TAB_PROPOSAL = 2;
@@ -156,5 +160,6 @@ export const TAB_PENDING_REGISTER = 0;
 export const TAB_PENDING_PROMOTED = 1;
 export const TAB_PENDING_SARALY = 2;
 export const TAB_PENDING_PROPOSAL = 3;
+
 
 

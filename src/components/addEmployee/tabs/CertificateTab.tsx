@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../../redux/hook'
 import { createCertificateThunk, selectCertificateState, updateCertificateThunk } from '../../../redux/slices/certificateSlice'
 import { Certificate } from '../../../types/certificate'
 import { convertDateStringtoTime, convertTimeToDate, statusCode } from '../../../utils'
-import { CertificatesTable } from '../../tables/CertificatesTable'
+import { CertificatesTable } from '../tables/CertificatesTable'
 import { unwrapResult } from '@reduxjs/toolkit'
 import { useAppContext } from '../../../context/AppContext'
 

@@ -45,7 +45,10 @@ export const deleteFamilyThunk = createAsyncThunk(
   async (familyId: number, ThunkAPI) => {
     try {
       const response = await deleteFamily(familyId);
-      return response.data;
+      return {
+        ...response.data,
+        id: familyId
+      };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return ThunkAPI.rejectWithValue(error.response.data.message || 'Failed to delete family');
@@ -147,7 +150,7 @@ const familySlice = createSlice({
       state.familyError = null;
     });
     builder.addCase(deleteFamilyThunk.fulfilled, (state, action) => {
-      state.families.data = state.families.data.filter((family) => family.id !== action.payload);
+      state.families.data = state.families.data.filter((family) => family.id !== action.payload.id);
       state.familyStatus = 'succeeded';
     });
     builder.addCase(deleteFamilyThunk.rejected, (state, action) => {
@@ -189,4 +192,4 @@ const familySlice = createSlice({
 });
 
 export default familySlice.reducer;
-export const selectFamilyState = (state: RootState) => state.family;
+export const selectFamilyState = (state: RootState) => state.families;
