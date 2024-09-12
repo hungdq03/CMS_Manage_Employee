@@ -1,12 +1,13 @@
 import MuiAlert from '@mui/material/Alert';
 import Slide, { SlideProps } from '@mui/material/Slide';
 import Snackbar from '@mui/material/Snackbar';
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import Loader from '../components/core/Loader';
 import { useAppSelector } from '../redux/hook';
 import { selectEmployeesState } from '../redux/slices/employeesSlice';
 import { selectCertificateState } from '../redux/slices/certificateSlice';
 import { selectFamilyState } from '../redux/slices/familySlice';
+import { selectExperienceState } from '../redux/slices/experienceSlice';
 
 type SnackbarMessage = {
   message: string;
@@ -17,6 +18,7 @@ type AppContextType = {
   showMessage: (message: SnackbarMessage) => void;
   setLoading: (loading: boolean) => void;
   loading: boolean;
+  isMobile: boolean;
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -41,6 +43,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   const { employeeStatus, } = useAppSelector(selectEmployeesState);
   const { certificateStatus } = useAppSelector(selectCertificateState);
   const { familyStatus } = useAppSelector(selectFamilyState);
+  const { experienceStatus } = useAppSelector(selectExperienceState);
+  const [isMobile, setIsMobile] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const showMessage = (message: SnackbarMessage) => {
     setSnackbar(message);
@@ -62,7 +79,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   return (
-    <AppContext.Provider value={{ showMessage, setLoading: setLoadingState, loading }}>
+    <AppContext.Provider value={{ showMessage, setLoading: setLoadingState, loading, isMobile }}>
       {children}
       <Snackbar
         open={open}
@@ -80,6 +97,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         || employeeStatus === 'loading'
         || certificateStatus === 'loading'
         || familyStatus === 'loading'
+        || experienceStatus === 'loading'
         && (
           <Loader />
         )}

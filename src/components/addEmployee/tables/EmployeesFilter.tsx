@@ -6,7 +6,7 @@ import { ClearIcon } from '@mui/x-date-pickers/icons';
 import { MagnifyingGlass as MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import * as React from 'react';
 import { ChangeEvent, useState } from 'react';
-import { paramsSearchEmployees } from '../../types/employee';
+import { paramsSearchEmployees } from '../../../types/employee';
 interface EmployeesFiltersProps {
   keyword: string;
   onChangeParams: (state: Partial<paramsSearchEmployees>) => void;

@@ -2,9 +2,9 @@
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Fragment, useEffect, useState } from 'react';
-import EmployeeDialog from '../../../components/employees/dialogs/EmployeeDialog';
-import { EmployeesFilters } from '../../../components/tables/EmployeesFilter';
-import { EmployeesTable } from '../../../components/tables/EmployeesTable';
+import EmployeeDialog from '../../../components/addEmployee/dialogs/EmployeeDialog';
+import { EmployeesFilters } from '../../../components/addEmployee/tables/EmployeesFilter';
+import { EmployeesTable } from '../../../components/addEmployee/tables/EmployeesTable';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { fetchEmployeesPage, selectEmployeesState } from '../../../redux/slices/employeesSlice';
 import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../../types/employee';

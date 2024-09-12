@@ -4,14 +4,18 @@ import employeeReducer from './slices/employeesSlice';
 import userReducer from './slices/userSlice';
 import certificateReducer from './slices/certificateSlice';
 import familyReducer from './slices/familySlice';
+import experienceReducer from './slices/experienceSlice';
+import leadersReducer from './slices/leaderSlice';
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     auth: authReducer,
     employees: employeeReducer,
-    certificate: certificateReducer,
-    family: familyReducer
+    certificates: certificateReducer,
+    families: familyReducer,
+    experiences: experienceReducer,
+    leaders: leadersReducer
   },
 });
 

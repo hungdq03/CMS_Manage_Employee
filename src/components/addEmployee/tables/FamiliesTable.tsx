@@ -2,14 +2,14 @@ import { Box, Card, Divider, IconButton, Table, TableBody, TableCell, TableHead,
 import TablePagination from '@mui/material/TablePagination';
 import { PencilSimple } from '@phosphor-icons/react';
 import React, { ChangeEvent, MouseEvent } from 'react';
-import { useAppDispatch } from '../../redux/hook';
-import { deleteFamilyThunk } from '../../redux/slices/familySlice';
-import { GENDER } from '../../types/employee';
-import { Family } from '../../types/family';
-import { formatDate, statusCode } from '../../utils';
-import ConfirmationDialog from '../core/ConfirmationDialog';
+import { useAppDispatch } from '../../../redux/hook';
+import { deleteFamilyThunk } from '../../../redux/slices/familySlice';
+import { GENDER } from '../../../types/employee';
+import { Family } from '../../../types/family';
+import { formatDate, statusCode } from '../../../utils';
+import ConfirmationDialog from '../../core/ConfirmationDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../../context/AppContext';
 
 interface Props {
   count?: number;
@@ -39,7 +39,10 @@ export function FamiliesTable({
     setFamilySelected(familySelected)
   }
 
-  const handleDeleteFamily = async (familyId: number) => {
+  const handleDeleteFamily = async (familyId: number | null) => {
+    if (!familyId) {
+      return;
+    }
     const resultAction = await dispatch(deleteFamilyThunk(familyId));
     const response = unwrapResult(resultAction);
 
@@ -95,8 +98,8 @@ export function FamiliesTable({
                 </TableCell>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>{row.name}</TableCell>
-                <TableCell>{formatDate(row.dateOfBirth)}</TableCell>
-                <TableCell>{Object.entries(GENDER)[row.gender]}</TableCell>
+                <TableCell>{row.dateOfBirth ? formatDate(row.dateOfBirth) : ''}</TableCell>
+                <TableCell>{row.gender ? Object.values(GENDER)[row.gender] : ''}</TableCell>
                 <TableCell>{row.relationShip}</TableCell>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row.address}</TableCell>

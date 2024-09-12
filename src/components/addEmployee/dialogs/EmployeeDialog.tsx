@@ -2,17 +2,18 @@
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { PencilSimple, Plus } from '@phosphor-icons/react';
 import React, { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../../redux/hook';
-import { RootState } from '../../../redux/store';
-import { selectEmployeeById } from '../../../redux/slices/employeesSlice';
-import { a11yProps, TabPanel } from '../../../styles/theme/components/TabPanel';
-import { Employee, TAB_CERTIFICATE, TAB_EMPLOYEE, TAB_FAMILY } from '../../../types/employee';
-import EmployeeTab from '../tabs/EmployeeTab';
 import { useAppContext } from '../../../context/AppContext';
-import CertificateTab from '../tabs/CertificateTab';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { getCertificatesByEmployeeThunk } from '../../../redux/slices/certificateSlice';
-import FamilyTab from '../tabs/FamilyTab';
+import { selectEmployeeById } from '../../../redux/slices/employeesSlice';
 import { getFamiliesByEmployeeThunk } from '../../../redux/slices/familySlice';
+import { RootState } from '../../../redux/store';
+import { TabPanel } from '../../../styles/theme/components/TabPanel';
+import { Employee, TAB_CERTIFICATE, TAB_EMPLOYEE, TAB_FAMILY } from '../../../types/employee';
+import CertificateTab from '../tabs/CertificateTab';
+import EmployeeTab from '../tabs/EmployeeTab';
+import FamilyTab from '../tabs/FamilyTab';
+import ProfileEmployeeDialog from '../../employeeProfile/dialogs/ProfileEmployeeDialog';
 
 interface Props {
   employeeId?: number;
@@ -25,7 +26,7 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
   const [isOpenDialog, setOpenDialog] = useState<boolean>(false);
   const employeeFormRef = useRef<any>(null);
   const { showMessage } = useAppContext();
-
+  const [showProfile, setShowProfile] = useState(false)
   const employeeSelected = useAppSelector((state: RootState) =>
     isOpenDialog && employeeId && type === 'UPDATE' ?
       selectEmployeeById(state, employeeId) : undefined
@@ -63,6 +64,9 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
     setEmployee(undefined)
     setTab(0);
   }
+  const handleCloseProfile = () => {
+    setShowProfile(false);
+  };
 
   const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
     if (newValue !== TAB_EMPLOYEE) {
@@ -91,7 +95,7 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
     if (tab === TAB_EMPLOYEE) {
       employeeFormRef.current?.submit();
     }
-    // setShowProfile(true);
+    setShowProfile(true);
   };
 
   const button = useMemo(() => {
@@ -152,12 +156,11 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
                 textColor="primary"
                 variant="fullWidth"
               >
-                <Tab label="Thông tin nhân viên" {...a11yProps(TAB_EMPLOYEE)} />
+                <Tab label="Thông tin nhân viên" />
                 <Tab
                   label="Thông tin văn bằng"
-                  {...a11yProps(TAB_CERTIFICATE)}
                 />
-                <Tab label="Thông tin gia đình" {...a11yProps(TAB_FAMILY)} />
+                <Tab label="Thông tin gia đình" />
               </Tabs>
             </AppBar>
             <TabPanel value={tab} index={TAB_EMPLOYEE}>
@@ -231,7 +234,15 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
           </div>
         </DialogActions>
       </Dialog>
-    </ >
+
+      {showProfile && employeeId && (
+        <ProfileEmployeeDialog
+          employeeId={employeeId}
+          isOpenDialog={showProfile}
+          handleCloseDialog={handleCloseProfile}
+        />
+      )}
+    </>
   );
 };
 

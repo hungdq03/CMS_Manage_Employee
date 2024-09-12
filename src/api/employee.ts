@@ -17,6 +17,10 @@ export const deleteEmployee = (id: number) => {
   return axiosInstance.delete(`/employee/${id}`)
 }
 
+export const getEmployeeById = (id: number) => {
+  return axiosInstance.get(`/employee/${id}`)
+}
+
 export const uploadImage = (data: FormData) => {
   return axiosInstance.post('/employee/upload-image', data, {
     headers: {

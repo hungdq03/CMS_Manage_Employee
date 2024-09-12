@@ -2,13 +2,13 @@ import { Box, Card, Divider, IconButton, Table, TableBody, TableCell, TableHead,
 import TablePagination from '@mui/material/TablePagination';
 import { PencilSimple } from '@phosphor-icons/react';
 import React, { ChangeEvent, MouseEvent } from 'react';
-import { useAppDispatch } from '../../redux/hook';
-import { deleteCertificateThunk } from '../../redux/slices/certificateSlice';
-import { Certificate } from '../../types/certificate';
-import { formatDate, statusCode } from '../../utils';
-import ConfirmationDialog from '../core/ConfirmationDialog';
+import { useAppDispatch } from '../../../redux/hook';
+import { deleteCertificateThunk } from '../../../redux/slices/certificateSlice';
+import { Certificate } from '../../../types/certificate';
+import { formatDate, statusCode } from '../../../utils';
+import ConfirmationDialog from '../../core/ConfirmationDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
-import { useAppContext } from '../../context/AppContext';
+import { useAppContext } from '../../../context/AppContext';
 
 interface Props {
   count?: number;

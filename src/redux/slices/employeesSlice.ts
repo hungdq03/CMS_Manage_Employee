@@ -1,8 +1,8 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { createEmployee, deleteEmployee, getEmployeesSearch, updateEmployee } from '../../api/employee';
-import { RootState } from '../store';
+import { createEmployee, deleteEmployee, getEmployeeById, getEmployeesSearch, updateEmployee } from '../../api/employee';
 import { Employee } from '../../types/employee';
+import { RootState } from '../store';
 
 interface EmployeesState {
   employees: {
@@ -10,6 +10,11 @@ interface EmployeesState {
     data: Employee[],
     message: string,
     totalElements: number
+  };
+  employee: {
+    code: number,
+    message: string,
+    data: Employee | null,
   };
   employeeStatus: 'idle' | 'loading' | 'succeeded' | 'failed';
   employeeError: string | null;
@@ -21,6 +26,11 @@ const initialState: EmployeesState = {
     data: [],
     message: '',
     totalElements: 0
+  },
+  employee: {
+    code: 0,
+    message: '',
+    data: null,
   },
   employeeStatus: 'idle',
   employeeError: null,
@@ -79,11 +89,30 @@ export const deleteEmployeeThunk = createAsyncThunk(
   'employees/deleteEmployee',
   async (id: number, ThunkAPI) => {
     try {
-      await deleteEmployee(id);
-      return id;
+      const response = await deleteEmployee(id);
+      return {
+        ...response.data,
+        id
+      };
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
         return ThunkAPI.rejectWithValue(error.response.data.message || 'Failed to delete employee');
+      }
+      return ThunkAPI.rejectWithValue('An unexpected error occurred');
+    }
+  }
+);
+
+// Thunk for get employee by id
+export const getEmployeeByIdThunk = createAsyncThunk(
+  'employees/getEmployeeById',
+  async (id: number, ThunkAPI) => {
+    try {
+      const response = await getEmployeeById(id);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        return ThunkAPI.rejectWithValue(error.response.data.message || 'Failed to get employee by id');
       }
       return ThunkAPI.rejectWithValue('An unexpected error occurred');
     }
@@ -94,15 +123,7 @@ export const deleteEmployeeThunk = createAsyncThunk(
 const employeeSlice = createSlice({
   name: 'employees',
   initialState,
-  reducers: {
-    employeeUpdated(state, action: PayloadAction<Employee>) {
-
-      let existingEmployee = state.employees.data.find((employee) => employee.id === action.payload.id)
-      if (existingEmployee) {
-        existingEmployee = action.payload
-      }
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       // Fetch employees page
@@ -145,15 +166,29 @@ const employeeSlice = createSlice({
         state.employeeStatus = 'failed';
         state.employeeError = action.error.message || null;
       })
+
       // Delete employee
       .addCase(deleteEmployeeThunk.pending, (state) => {
         state.employeeStatus = 'loading';
       })
       .addCase(deleteEmployeeThunk.fulfilled, (state, action) => {
         state.employeeStatus = 'succeeded';
-        state.employees.data = state.employees.data.filter(employee => employee.id !== Number(action.payload));
+        state.employees.data = state.employees.data.filter(employee => employee.id !== Number(action.payload.id));
       })
       .addCase(deleteEmployeeThunk.rejected, (state, action) => {
+        state.employeeStatus = 'failed';
+        state.employeeError = action.error.message || null;
+      })
+
+      // Get employee by id
+      .addCase(getEmployeeByIdThunk.pending, (state) => {
+        state.employeeStatus = 'loading';
+      })
+      .addCase(getEmployeeByIdThunk.fulfilled, (state, action) => {
+        state.employeeStatus = 'succeeded';
+        state.employee = action.payload;
+      })
+      .addCase(getEmployeeByIdThunk.rejected, (state, action) => {
         state.employeeStatus = 'failed';
         state.employeeError = action.error.message || null;
       });
