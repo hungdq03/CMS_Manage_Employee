@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Fragment, useEffect, useState } from 'react';
-import EmployeeDialog from '../../../components/addEmployee/dialogs/EmployeeDialog';
-import { EmployeesFilters } from '../../../components/addEmployee/tables/EmployeesFilter';
-import { EmployeesTable } from '../../../components/addEmployee/tables/EmployeesTable';
-import { useAppDispatch, useAppSelector } from '../../../redux/hook';
-import { fetchEmployeesPage, selectEmployeesState } from '../../../redux/slices/employeesSlice';
-import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../../types/employee';
+import { Fragment, useLayoutEffect, useState } from 'react';
+import EmployeeDialog from '../../components/addEmployee/dialogs/EmployeeDialog';
+import { EmployeesFilters } from '../../components/addEmployee/tables/EmployeesFilter';
+import { EmployeesTable } from '../../components/addEmployee/tables/EmployeesTable';
+import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import { fetchEmployeesPage, selectEmployeesState } from '../../redux/slices/employeesSlice';
+import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../types/employee';
 
 const AddEmployeePage = () => {
   const dispatch = useAppDispatch()
@@ -22,9 +22,9 @@ const AddEmployeePage = () => {
     }
   )
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchData(params);
-  }, [dispatch]);
+  }, []);
 
   const onChangeParams = (partialParams: Partial<paramsSearchEmployees>) => {
     setParams((prevParams) => {

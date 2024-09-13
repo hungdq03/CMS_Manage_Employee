@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { PencilSimple, Plus } from '@phosphor-icons/react';
-import React, { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useAppContext } from '../../../context/AppContext';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { getCertificatesByEmployeeThunk } from '../../../redux/slices/certificateSlice';
@@ -33,12 +33,12 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
   )
   const [employee, setEmployee] = useState<Employee>();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (employeeId && isOpenDialog) {
       dispatch(getCertificatesByEmployeeThunk(employeeId));
       dispatch(getFamiliesByEmployeeThunk(employeeId))
     }
-  }, [isOpenDialog])
+  }, [dispatch, employeeId, isOpenDialog])
 
   useEffect(() => {
     if (employeeSelected) {

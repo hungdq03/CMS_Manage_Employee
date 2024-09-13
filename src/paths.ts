@@ -18,4 +18,5 @@ export const paths = {
       approved: `${constantList.ROOT_PATH}leader/approved`,
     },
   },
+  errors: { forbidden: '/errors/forbidden' },
 } as const;

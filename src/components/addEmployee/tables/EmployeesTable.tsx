@@ -143,7 +143,7 @@ export function EmployeesTable({
                       </IconButton>
                     )}
                   </TableCell>
-                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{page !== 1 ? (page - 1) * rowsPerPage + index + 1 : index + 1}</TableCell>
                   <TableCell>{row.code}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{formatDate(row.dateOfBirth)}</TableCell>

@@ -18,7 +18,6 @@ interface Props {
 }
 
 const CvTab: React.FC<Props> = ({ employeeId }) => {
-  const { isMobile } = useAppContext();
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
@@ -155,9 +154,7 @@ const CvTab: React.FC<Props> = ({ employeeId }) => {
 
 
   return (
-    <Grid container spacing={2} sx={{
-      width: isMobile ? '400px' : '950px',
-    }}>
+    <Grid container spacing={2}>
       <Grid item xs={12} md={5} >
         <div className="flex flex-col gap-4">
           <div className="w-[200px] h-[200px]">

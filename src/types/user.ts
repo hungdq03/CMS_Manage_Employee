@@ -71,3 +71,8 @@ export interface User {
   imagePath: string | null;
   setPassword: boolean;
 }
+
+export const AuthRole = {
+  admin: ['ROLE_ADMIN'],
+  user: ['ROLE_ADMIN', 'ROLE_USER'],
+};

@@ -47,7 +47,7 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
           <ListItemIcon>
             <SignOutIcon fontSize="var(--icon-fontSize-md)" />
           </ListItemIcon>
-          Sign out
+          Đăng xuất
         </MenuItem>
       </MenuList>
     </Popover>

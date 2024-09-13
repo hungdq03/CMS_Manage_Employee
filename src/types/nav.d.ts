@@ -9,4 +9,5 @@ export interface NavItemConfig {
   items?: NavItemConfig[];
   children?: NavItemConfig[];
   matcher?: { type: 'startsWith' | 'equals'; href: string };
+  role?: string[];
 }
