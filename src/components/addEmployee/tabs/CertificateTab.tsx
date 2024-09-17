@@ -1,15 +1,14 @@
 import { Button, Grid } from '@mui/material'
+import { unwrapResult } from '@reduxjs/toolkit'
 import moment from 'moment'
 import React, { ChangeEvent, MouseEvent, useLayoutEffect, useState } from 'react'
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator'
-import { useSelector } from 'react-redux'
-import { useAppDispatch } from '../../../redux/hook'
+import { useAppContext } from '../../../context/AppContext'
+import { useAppDispatch, useAppSelector } from '../../../redux/hook'
 import { createCertificateThunk, selectCertificateState, updateCertificateThunk } from '../../../redux/slices/certificateSlice'
 import { Certificate } from '../../../types/certificate'
 import { convertDateStringtoTime, convertTimeToDate, statusCode } from '../../../utils'
 import { CertificatesTable } from '../tables/CertificatesTable'
-import { unwrapResult } from '@reduxjs/toolkit'
-import { useAppContext } from '../../../context/AppContext'
 
 type Props = {
   employeeId: number
@@ -27,8 +26,7 @@ const CertificateTab: React.FC<Props> = ({ employeeId }) => {
       keyword: '',
     }
   )
-
-  const { certificates } = useSelector(selectCertificateState);
+  const { certificates } = useAppSelector(selectCertificateState);
 
   useLayoutEffect(() => {
     const startOfPage = (pagination.pageIndex - 1) * pagination.pageSize;

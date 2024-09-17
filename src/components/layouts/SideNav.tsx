@@ -5,8 +5,8 @@ import Typography from '@mui/material/Typography';
 import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import * as React from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { useAppSelector } from '../../redux/hook';
 import { isNavItemActive } from '../../lib/isNavItemActive';
+import { useAppSelector } from '../../redux/hook';
 import { selectCurrentUser } from '../../redux/slices/userSlice';
 import type { NavItemConfig } from '../../types/nav';
 import { navItems } from './config';
@@ -63,33 +63,36 @@ export function SideNav(): React.JSX.Element {
               sx={{ color: 'inherit', fontSize: '0.875rem', fontWeight: 500, lineHeight: '28px' }}
             >
               {currentUser?.user?.username}
-
             </Typography>
           </Box>
         </Box>
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: navItems, userRole: currentUser.user?.roles.map(role => role.name) })}
       </Box>
     </Box>
   );
 }
 
-function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pathname: string }): React.JSX.Element {
+function renderNavItems({ items = [], pathname, userRole }:
+  { items?: NavItemConfig[]; pathname: string, userRole?: string[] }): React.JSX.Element {
+
   const children = items.map((item) => (
-    <NavItem
-      key={item.key}
-      pathname={pathname}
-      disabled={item.disabled}
-      external={item.external}
-      href={item.href}
-      icon={item.icon}
-      matcher={item.matcher}
-      title={item.title}
-    >
-      {item.children && renderNavItems({ items: item.children, pathname })}
-    </NavItem>
+    item.role?.some(role => userRole?.includes(role)) && (
+      <NavItem
+        key={item.key}
+        pathname={pathname}
+        disabled={item.disabled}
+        external={item.external}
+        href={item.href}
+        icon={item.icon}
+        matcher={item.matcher}
+        title={item.title}
+      >
+        {item.children && renderNavItems({ items: item.children, pathname, userRole })}
+      </NavItem>
+    )
   ));
 
   return (

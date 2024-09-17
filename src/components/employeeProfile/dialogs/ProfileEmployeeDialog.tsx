@@ -13,21 +13,29 @@ import { CertificateProfileTab } from '../tabs/CertificateProfileTab';
 import CvTab from '../tabs/CvTab';
 import { ProfileTab } from '../tabs/ProfileTab';
 import { SubmitLeaderDialog } from './SubmitLeaderDialog';
+import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
+import { ApprovalDialog } from '../../pendingApproval/dialogs/ApprovalDialog';
+import { AddRequestDialog } from '../../pendingApproval/dialogs/AddRequestDialog';
+import { ReasonRefusalDialog } from '../../pendingApproval/dialogs/ReasonRefusalDialog';
 
 interface Props {
   employeeId: number;
   isOpenDialog: boolean;
   handleCloseDialog: () => void;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean
 }
 
-const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isManage, isEnd }) => {
+const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isAdmin, isEnd }) => {
   const [tab, setTab] = useState(0);
   const dispatch = useAppDispatch();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
   const { isMobile } = useAppContext();
-  const [isSubmitLeader, setIsSubmitLeader] = useState(false);
+  const [isSubmitLeader, setIsSubmitLeader] = useState<boolean>(false);
+  const [openResignationLetter, setOpenResignationLetter] = useState<boolean>(true);
+  const [openApprovalDialog, setOpenApprovalDialog] = useState<boolean>(false);
+  const [openAddRequestDialog, setOpenAddRequestDialog] = useState<boolean>(false);
+  const [openReasonRefusalDialog, setOpenReasonRefusalDialog] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     dispatch(getFamiliesByEmployeeThunk(employeeId))
@@ -45,6 +53,34 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
 
   const handleCloseSubmitLeader = () => {
     setIsSubmitLeader(false)
+  }
+
+  const handleCloseResignationLetter = () => {
+    setOpenResignationLetter(false)
+  }
+
+  const handleOpenApprovalDialog = () => {
+    setOpenApprovalDialog(true)
+  }
+
+  const handleCloseApprovalDialog = () => {
+    setOpenApprovalDialog(false)
+  }
+
+  const handleOpenAddRequestDialog = () => {
+    setOpenAddRequestDialog(true)
+  }
+
+  const handleCloseAddRequestDialog = () => {
+    setOpenAddRequestDialog(false)
+  }
+
+  const handleOpenReasonRefusalDialog = () => {
+    setOpenReasonRefusalDialog(true)
+  }
+
+  const handleCloseReasonRefusalDialog = () => {
+    setOpenReasonRefusalDialog(false)
   }
 
   return (
@@ -97,7 +133,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                   }} />}
             </Tabs>
 
-            <div className='max-w-[1000px] min-h-[700px] flex-1'>
+            <div className='max-w-[1000px] min-h-[700px] flex-1 overflow-auto'>
               <TabPanel value={tab} index={TAB_PROFILE_CV} >
                 <CvTab
                   employeeId={employeeId}
@@ -109,83 +145,85 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
               <TabPanel value={tab} index={TAB_PROFILE_CERTIFICATE} >
                 <CertificateProfileTab employeeId={employeeId} />
               </TabPanel>
-              {/* {isEnd &&
-              <TabPanel value={tab} index={3} className="tabPanel">
-                <ResignationLetter
-                  t={t}
-                  open={open}
-                  handleClose={handleClose}
-                  employee={employee}
-                  isManage={isManage}
-                  handleDialogEmployeeClose={handleDialogEmployeeClose}
-                  isEnd={isEnd}
-                />
-              </TabPanel>
-              } */}
+              {isEnd &&
+                <TabPanel value={tab} index={3}>
+                  <ResignationLetter
+                    open={openResignationLetter}
+                    onClose={handleCloseResignationLetter}
+                    employeeId={employeeId}
+                    isAdmin={isAdmin}
+                  />
+                </TabPanel>
+              }
             </div>
           </div>
         </DialogContent>
 
-        <DialogActions>
-          {ACTION_EMPLOYEE.EDIT.includes(employee?.submitProfileStatus.toString() ?? '') &&
-            STATUS_EMPLOYEE.ADD.includes(employee?.submitProfileStatus.toString() ?? '') && (
-              <div>
+        <DialogActions >
+          <div className='w-full flex justify-center space-x-2'>
+            {ACTION_EMPLOYEE.EDIT.includes(employee?.submitProfileStatus.toString() ?? '') &&
+              STATUS_EMPLOYEE.ADD.includes(employee?.submitProfileStatus.toString() ?? '') && (
+                <div>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="button"
+                    onClick={handleOpenSubmitLeader}
+                  >
+                    Gửi lãnh đạo
+                  </Button>
+                </div>
+              )}
+            {isAdmin &&
+              (ACTION_EMPLOYEE.PENDING_END.includes(
+                employee?.submitProfileStatus.toString() ?? ''
+              ) ||
+                STATUS_EMPLOYEE.APPROVED.includes(
+                  employee?.submitProfileStatus.toString() ?? ''
+                )) && (
                 <Button
                   variant="contained"
                   color="primary"
                   type="button"
-                  onClick={handleOpenSubmitLeader}
                 >
-                  Gửi lãnh đạo
+                  Lịch sử cập nhật
                 </Button>
-              </div>
-            )}
-          {isManage &&
-            (ACTION_EMPLOYEE.PENDING_END.includes(
-              employee?.submitProfileStatus.toString() ?? ''
-            ) ||
-              STATUS_EMPLOYEE.APPROVED.includes(
-                employee?.submitProfileStatus.toString() ?? ''
-              )) && (
-              <Button
-                variant="contained"
-                color="primary"
-                type="button"
-              >
-                Lịch sử cập nhật
-              </Button>
-            )}
-          {isManage &&
-            ACTION_EMPLOYEE.PENDING.includes(employee?.submitProfileStatus.toString() ?? '') && (
-              <>
-                <Button
-                  variant="contained"
-                  color="primary"
-                >
-                  Phê duyệt
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                >
-                  Yêu cầu bổ sung
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                >
-                  Từ chối
-                </Button>
-              </>
-            )}
-          <Button
-            variant="contained"
-            color="secondary"
-            type="button"
-            onClick={handleCloseDialog}
-          >
-            Hủy
-          </Button>
+              )}
+            {isAdmin &&
+              ACTION_EMPLOYEE.PENDING.includes(employee?.submitProfileStatus.toString() ?? '') && (
+                <>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenApprovalDialog}
+                  >
+                    Phê duyệt
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenAddRequestDialog}
+                  >
+                    Yêu cầu bổ sung
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenReasonRefusalDialog}
+                  >
+                    Từ chối
+                  </Button>
+                </>
+              )}
+            <Button
+              variant="contained"
+              color="error"
+              type="button"
+              onClick={handleCloseDialog}
+            >
+              Hủy
+            </Button>
+          </div>
         </DialogActions>
       </Dialog>
 
@@ -193,6 +231,27 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
         employeeId={employeeId}
         onClose={handleCloseSubmitLeader}
         open={isSubmitLeader}
+      />
+
+      <ApprovalDialog
+        employeeId={employeeId}
+        open={openApprovalDialog}
+        onClose={handleCloseApprovalDialog}
+        isRegister
+      />
+
+      <AddRequestDialog
+        open={openAddRequestDialog}
+        onClose={handleCloseAddRequestDialog}
+        employeeId={employeeId}
+        isRegister
+      />
+
+      <ReasonRefusalDialog
+        open={openReasonRefusalDialog}
+        onClose={handleCloseReasonRefusalDialog}
+        employeeId={employeeId}
+        isRegister={true}
       />
     </>
   )

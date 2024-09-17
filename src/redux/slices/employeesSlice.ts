@@ -144,7 +144,7 @@ const employeeSlice = createSlice({
       })
       .addCase(createEmployeeThunk.fulfilled, (state, action) => {
         state.employeeStatus = 'succeeded';
-        state.employees.data.push(action.payload);
+        state.employees.data.push(action.payload.data);
       })
       .addCase(createEmployeeThunk.rejected, (state, action) => {
         state.employeeStatus = 'failed';

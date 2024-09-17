@@ -8,6 +8,7 @@ import { selectEmployeesState } from '../redux/slices/employeesSlice';
 import { selectCertificateState } from '../redux/slices/certificateSlice';
 import { selectFamilyState } from '../redux/slices/familySlice';
 import { selectExperienceState } from '../redux/slices/experienceSlice';
+import { selectCurrentUser } from '../redux/slices/userSlice';
 
 type SnackbarMessage = {
   message: string;
@@ -21,6 +22,7 @@ type AppContextType = {
   isMobile: boolean;
 };
 
+// Define the AppContext with a default value of undefined
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const useAppContext = (): AppContextType => {
@@ -40,7 +42,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   const [snackbar, setSnackbar] = useState<SnackbarMessage | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { employeeStatus, } = useAppSelector(selectEmployeesState);
+  const { userStatus } = useAppSelector(selectCurrentUser);
+  const { employeeStatus } = useAppSelector(selectEmployeesState);
   const { certificateStatus } = useAppSelector(selectCertificateState);
   const { familyStatus } = useAppSelector(selectFamilyState);
   const { experienceStatus } = useAppSelector(selectExperienceState);
@@ -94,13 +97,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
       </Snackbar>
       {/* Loading indicator */}
       {loading
+        || userStatus === 'loading'
         || employeeStatus === 'loading'
         || certificateStatus === 'loading'
         || familyStatus === 'loading'
-        || experienceStatus === 'loading'
-        && (
-          <Loader />
-        )}
+        || experienceStatus === 'loading' ? (
+        <Loader />
+      ) : null}
     </AppContext.Provider>
   );
 };

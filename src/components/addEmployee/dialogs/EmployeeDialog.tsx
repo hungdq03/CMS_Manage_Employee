@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tab, Tabs, Tooltip } from '@mui/material';
 import { PencilSimple, Plus } from '@phosphor-icons/react';
-import React, { SyntheticEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useAppContext } from '../../../context/AppContext';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { getCertificatesByEmployeeThunk } from '../../../redux/slices/certificateSlice';
@@ -31,20 +31,29 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
     isOpenDialog && employeeId && type === 'UPDATE' ?
       selectEmployeeById(state, employeeId) : undefined
   )
+  const [employeeSelectedId, setEmployeeSelectedId] = useState<number>()
   const [employee, setEmployee] = useState<Employee>();
 
-  useEffect(() => {
-    if (employeeId && isOpenDialog) {
-      dispatch(getCertificatesByEmployeeThunk(employeeId));
-      dispatch(getFamiliesByEmployeeThunk(employeeId))
+  useLayoutEffect(() => {
+    if (employeeSelectedId && isOpenDialog) {
+      dispatch(getCertificatesByEmployeeThunk(employeeSelectedId));
+      dispatch(getFamiliesByEmployeeThunk(employeeSelectedId))
     }
-  }, [isOpenDialog])
+  }, [dispatch, employeeSelectedId, isOpenDialog])
 
   useEffect(() => {
     if (employeeSelected) {
       setEmployee(employeeSelected)
     }
   }, [employeeSelected])
+
+  useEffect(() => {
+    if (type === 'UPDATE') {
+      setEmployeeSelectedId(employeeId)
+    } else if (type === 'ADD') {
+      setEmployeeSelectedId(employee?.id)
+    }
+  }, [employee, employeeId, type])
 
   const handleChangeInput = (partialEmployee: Partial<Employee>) => {
     setEmployee((prev: Employee | undefined) => ({
@@ -171,16 +180,16 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
               />
             </TabPanel>
             {
-              employeeId &&
+              employeeSelectedId &&
               (
                 <>
                   <TabPanel value={tab} index={TAB_CERTIFICATE}>
                     <CertificateTab
-                      employeeId={employeeId}
+                      employeeId={employeeSelectedId}
                     />
                   </TabPanel>
                   <TabPanel value={tab} index={TAB_FAMILY}>
-                    <FamilyTab employeeId={employeeId} />
+                    <FamilyTab employeeId={employeeSelectedId} />
                   </TabPanel>
                 </>
               )
@@ -235,9 +244,9 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
         </DialogActions>
       </Dialog>
 
-      {showProfile && employeeId && (
+      {showProfile && employeeSelectedId && (
         <ProfileEmployeeDialog
-          employeeId={employeeId}
+          employeeId={employeeSelectedId}
           isOpenDialog={showProfile}
           handleCloseDialog={handleCloseProfile}
         />

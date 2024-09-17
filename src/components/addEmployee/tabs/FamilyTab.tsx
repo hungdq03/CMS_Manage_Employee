@@ -1,17 +1,17 @@
 import { Button, Grid, MenuItem } from '@mui/material';
-import React, { ChangeEvent, useEffect, useLayoutEffect, useState, MouseEvent, useRef } from 'react'
-import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
-import { GENDER, RELATIONSHIP } from '../../../types/employee';
-import { convertDateStringtoTime, convertTimeToDate, statusCode } from '../../../utils';
-import { useAppDispatch } from '../../../redux/hook';
-import { Family } from '../../../types/family';
-import moment from 'moment';
-import { addAgeValidationRule, addEmailValidationRule, addIdentityCardValidationRule, addPhoneValidationRule, removeAgeValidationRule, removeEmailValidationRule, removeIdentityCardValidationRule, removePhoneValidationRule } from '../../../lib/employeeValidator';
-import { useSelector } from 'react-redux';
-import { createFamilyThunk, selectFamilyState, updateFamilyThunk } from '../../../redux/slices/familySlice';
-import { FamiliesTable } from '../tables/FamiliesTable';
 import { unwrapResult } from '@reduxjs/toolkit';
+import moment from 'moment';
+import React, { ChangeEvent, MouseEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
+import { useSelector } from 'react-redux';
 import { useAppContext } from '../../../context/AppContext';
+import { addAgeValidationRule, addEmailValidationRule, addIdentityCardValidationRule, addPhoneValidationRule, removeAgeValidationRule, removeEmailValidationRule, removeIdentityCardValidationRule, removePhoneValidationRule } from '../../../lib/employeeValidator';
+import { useAppDispatch } from '../../../redux/hook';
+import { createFamilyThunk, selectFamilyState, updateFamilyThunk } from '../../../redux/slices/familySlice';
+import { GENDER, RELATIONSHIP } from '../../../types/employee';
+import { Family } from '../../../types/family';
+import { convertDateStringtoTime, convertTimeToDate, statusCode } from '../../../utils';
+import { FamiliesTable } from '../tables/FamiliesTable';
 
 interface Props {
   employeeId: number
@@ -23,8 +23,9 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
   const [family, setFamily] = useState<Family>();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formRef = useRef<any>(null);
-
   const [familiesByPage, setFamiliesByPage] = useState<Family[]>([])
+  const { families } = useSelector(selectFamilyState);
+
   const [pagination, setPagination] = useState(
     {
       pageIndex: 1,
@@ -32,8 +33,6 @@ const FamilyTab: React.FC<Props> = ({ employeeId }) => {
       keyword: '',
     }
   )
-
-  const { families } = useSelector(selectFamilyState);
 
   useLayoutEffect(() => {
     const startOfPage = (pagination.pageIndex - 1) * pagination.pageSize;
