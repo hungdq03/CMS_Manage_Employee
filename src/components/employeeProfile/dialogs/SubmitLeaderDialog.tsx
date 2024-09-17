@@ -53,8 +53,10 @@ export const SubmitLeaderDialog: React.FC<Props> = ({ open, onClose, employeeId 
       ...submitLeader,
       submitProfileStatus: 2,
     };
+
     const resultAction = await dispatch(updateEmployeeThunk(data));
     const response = unwrapResult(resultAction)
+
     if (response.code === statusCode.SUCCESS) {
       showMessage({
         message: 'Cập nhật thông tin trình lãnh đạo thành công.',

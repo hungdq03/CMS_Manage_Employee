@@ -34,6 +34,9 @@ export type Employee = {
   reasonForRejection?: string | null;
   additionalRequestTermination?: string | null;
   terminationAppointmentDate?: number | null;
+  additionalRequestSalary?: string | null;
+  additionalRequestProposal?: string | null;
+  additionalRequestProcess?: string | null;
   refuseEndProfileDay?: number | null;
   reasonForRefuseEndProfile?: string | null;
   endDay?: number | null;
@@ -121,7 +124,7 @@ export const PROPOSAL_TYPE: Record<number, string> = {
   4: "Đề xuất tăng giờ làm",
 };
 
-export const STATUS_PROFILE: Record<string, string> = {
+export const STATUS_PROFILE: Record<number, string> = {
   0: "Nộp lưu",
   1: "Lưu mới",
   2: "Chờ xử lý",
@@ -135,10 +138,10 @@ export const STATUS_PROFILE: Record<string, string> = {
 };
 
 export const ACTION_EMPLOYEE = {
-  VIEW: "2, 3,6,8,9",
+  VIEW: "2,3,6,8,9",
   EDIT: "1,4,5,3,8,9",
   DELETE: "1",
-  NOTIFY: "4,5, 8,9",
+  NOTIFY: "4,5,8,9",
   END: "7",
   PENDING_END: "6",
   PENDING: "2",

@@ -19,7 +19,7 @@ const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) => {
   const currentUser = useAppSelector(selectCurrentUser)
   const token = Cookies.get('token');
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (token) {
       dispatch(fetchCurrentUser())
         .then(unwrapResult)

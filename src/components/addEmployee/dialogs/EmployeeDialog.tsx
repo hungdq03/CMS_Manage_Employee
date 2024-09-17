@@ -31,20 +31,29 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
     isOpenDialog && employeeId && type === 'UPDATE' ?
       selectEmployeeById(state, employeeId) : undefined
   )
+  const [employeeSelectedId, setEmployeeSelectedId] = useState<number>()
   const [employee, setEmployee] = useState<Employee>();
 
   useLayoutEffect(() => {
-    if (employeeId && isOpenDialog) {
-      dispatch(getCertificatesByEmployeeThunk(employeeId));
-      dispatch(getFamiliesByEmployeeThunk(employeeId))
+    if (employeeSelectedId && isOpenDialog) {
+      dispatch(getCertificatesByEmployeeThunk(employeeSelectedId));
+      dispatch(getFamiliesByEmployeeThunk(employeeSelectedId))
     }
-  }, [dispatch, employeeId, isOpenDialog])
+  }, [dispatch, employeeSelectedId, isOpenDialog])
 
   useEffect(() => {
     if (employeeSelected) {
       setEmployee(employeeSelected)
     }
   }, [employeeSelected])
+
+  useEffect(() => {
+    if (type === 'UPDATE') {
+      setEmployeeSelectedId(employeeId)
+    } else if (type === 'ADD') {
+      setEmployeeSelectedId(employee?.id)
+    }
+  }, [employee, employeeId, type])
 
   const handleChangeInput = (partialEmployee: Partial<Employee>) => {
     setEmployee((prev: Employee | undefined) => ({
@@ -171,16 +180,16 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
               />
             </TabPanel>
             {
-              employeeId &&
+              employeeSelectedId &&
               (
                 <>
                   <TabPanel value={tab} index={TAB_CERTIFICATE}>
                     <CertificateTab
-                      employeeId={employeeId}
+                      employeeId={employeeSelectedId}
                     />
                   </TabPanel>
                   <TabPanel value={tab} index={TAB_FAMILY}>
-                    <FamilyTab employeeId={employeeId} />
+                    <FamilyTab employeeId={employeeSelectedId} />
                   </TabPanel>
                 </>
               )
@@ -235,9 +244,9 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
         </DialogActions>
       </Dialog>
 
-      {showProfile && employeeId && (
+      {showProfile && employeeSelectedId && (
         <ProfileEmployeeDialog
-          employeeId={employeeId}
+          employeeId={employeeSelectedId}
           isOpenDialog={showProfile}
           handleCloseDialog={handleCloseProfile}
         />

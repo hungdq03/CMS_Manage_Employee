@@ -1,12 +1,12 @@
 import { Stack } from '@mui/material';
 import { useLayoutEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { fetchEmployeesPage, selectEmployeesState } from '../../redux/slices/employeesSlice';
-import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../types/employee';
-import { EmployeesFilters } from '../addEmployee/tables/EmployeesFilter';
-import { EmployeesTable } from '../addEmployee/tables/EmployeesTable';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { fetchEmployeesPage, selectEmployeesState } from '../../../redux/slices/employeesSlice';
+import { paramsSearchEmployees, STATUS_EMPLOYEE } from '../../../types/employee';
+import { EmployeesFilters } from '../../addEmployee/tables/EmployeesFilter';
+import { EmployeesTable } from '../../addEmployee/tables/EmployeesTable';
 
-export const PendingRegisterDialog = () => {
+export const PendingRegisterTab = () => {
   const dispatch = useAppDispatch()
   const { employees, employeeStatus, employeeError } = useAppSelector(selectEmployeesState);
 
@@ -41,8 +41,9 @@ export const PendingRegisterDialog = () => {
     dispatch(fetchEmployeesPage({ ...params }));
   }
 
-  if (employeeStatus === 'failed') return <div>{employeeError}</div>;
 
+
+  if (employeeStatus === 'failed') return <div>{employeeError}</div>;
   return (
     <>
       <Stack spacing={3}>
@@ -53,6 +54,7 @@ export const PendingRegisterDialog = () => {
           rows={employees.data}
           rowsPerPage={params.pageSize}
           onChangeParams={onChangeParams}
+          isAdmin
         />
       </Stack>
     </>

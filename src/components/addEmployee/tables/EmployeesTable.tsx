@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Bell, Eye } from '@phosphor-icons/react';
+import { Bell, Eye, Files } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useAppDispatch } from '../../../redux/hook';
 import { deleteEmployeeThunk } from '../../../redux/slices/employeesSlice';
@@ -20,6 +20,7 @@ import { useState } from 'react';
 import ProfileEmployeeDialog from '../../employeeProfile/dialogs/ProfileEmployeeDialog';
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppContext } from '../../../context/AppContext';
+import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
 
 interface Props {
   count?: number;
@@ -27,6 +28,8 @@ interface Props {
   rows?: Employee[];
   rowsPerPage?: number;
   onChangeParams: (state: Partial<paramsSearchEmployees>) => void;
+  isAdmin?: boolean;
+  isEnd?: boolean;
 }
 
 export function EmployeesTable({
@@ -35,10 +38,16 @@ export function EmployeesTable({
   page = 1,
   rowsPerPage = 0,
   onChangeParams,
+  isAdmin,
+  isEnd
 }: Props): React.JSX.Element {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const [openProfile, setOpenProfile] = useState<{
+    isOpen: boolean;
+    employeeId: number;
+  }>();
+  const [openRegisnationDialog, setOpenRegisnationDialog] = useState<{
     isOpen: boolean;
     employeeId: number;
   }>();
@@ -85,6 +94,21 @@ export function EmployeesTable({
     })
   }
 
+  const handleOpenRegisnationDialog = (employeeId: number) => {
+    setOpenRegisnationDialog({
+      employeeId,
+      isOpen: true
+    })
+  }
+
+  const handleCloseRegisnationDialog = () => {
+    setOpenRegisnationDialog({
+      employeeId: 0,
+      isOpen: false
+    })
+  }
+
+
   return (
     <>
       <Card>
@@ -107,42 +131,65 @@ export function EmployeesTable({
             <TableBody>
               {rows.map((row, index) => (
                 <TableRow key={row.id}>
-                  <TableCell align='center'>
-                    {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus.toString()) && (
-                      <EmployeeDialog type='UPDATE' employeeId={row.id} />
-                    )}
-
-                    {ACTION_EMPLOYEE.DELETE.includes(row.submitProfileStatus.toString()) && (
-                      <ConfirmationDialog
-                        onYesClick={() => handleDeleteEmployee(row.id)}
-                        title="Xác nhận"
-                        text={`Bạn có chắc chắn muốn xóa nhân viên: ${row.name}`}
-                        Yes="Xác nhận"
-                        No="Hủy"
-                        btnColor='error'
-                        iconName='Trash'
-                      />
-                    )}
-
-                    {ACTION_EMPLOYEE.VIEW.includes(row.submitProfileStatus.toString()) && (
+                  {isAdmin ?
+                    <TableCell>
+                      {ACTION_EMPLOYEE.END.includes(row.submitProfileStatus.toString() ?? '') &&
+                        <IconButton
+                          color="secondary"
+                          size='small'
+                          onClick={() => handleOpenProfile(row.id)}
+                        >
+                          <Eye color='green' />
+                        </IconButton>
+                      }
                       <IconButton
                         color="secondary"
                         size='small'
-                        onClick={() => handleOpenProfile(row.id)}
+                        onClick={() => ACTION_EMPLOYEE.PENDING_END.includes(row.submitProfileStatus.toString() ?? '') ? handleOpenRegisnationDialog(row.id) :
+                          handleOpenProfile(row.id)
+                        }
                       >
-                        <Eye color='green' />
+                        <Files color='blue' />
                       </IconButton>
-                    )}
+                    </TableCell>
+                    : <TableCell align='center'>
+                      {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus.toString() ?? '') && (
+                        <EmployeeDialog type='UPDATE' employeeId={row.id} />
+                      )}
 
-                    {ACTION_EMPLOYEE.NOTIFY.includes(row.submitProfileStatus.toString()) && (
-                      <IconButton
-                        color="secondary"
-                        size='small'
-                      >
-                        <Bell color='#ddb903' />
-                      </IconButton>
-                    )}
-                  </TableCell>
+                      {ACTION_EMPLOYEE.DELETE.includes(row.submitProfileStatus.toString() ?? '') && (
+                        <ConfirmationDialog
+                          onYesClick={() => handleDeleteEmployee(row.id)}
+                          title="Xác nhận"
+                          text={`Bạn có chắc chắn muốn xóa nhân viên: ${row.name}`}
+                          Yes="Xác nhận"
+                          No="Hủy"
+                          btnColor='error'
+                          iconName='Trash'
+                        />
+                      )}
+
+                      {ACTION_EMPLOYEE.VIEW.includes(row.submitProfileStatus.toString() ?? '') && (
+                        <IconButton
+                          color="secondary"
+                          size='small'
+                          onClick={() => handleOpenProfile(row.id)}
+                        >
+                          <Eye color='green' />
+                        </IconButton>
+                      )}
+
+                      {ACTION_EMPLOYEE.NOTIFY.includes(row.submitProfileStatus.toString() ?? '') && (
+                        <IconButton
+                          color="secondary"
+                          size='small'
+                        >
+                          <Bell color='#ddb903' />
+                        </IconButton>
+                      )}
+                    </TableCell>}
+
+
                   <TableCell>{page !== 1 ? (page - 1) * rowsPerPage + index + 1 : index + 1}</TableCell>
                   <TableCell>{row.code}</TableCell>
                   <TableCell>{row.name}</TableCell>
@@ -178,7 +225,18 @@ export function EmployeesTable({
           employeeId={openProfile?.employeeId}
           isOpenDialog={openProfile?.isOpen}
           handleCloseDialog={handleCloseProfile}
+          isAdmin={isAdmin}
+          isEnd={isEnd}
         />}
+      {
+        openRegisnationDialog &&
+        <ResignationLetter
+          employeeId={openRegisnationDialog?.employeeId}
+          open={openRegisnationDialog?.isOpen}
+          onClose={handleCloseRegisnationDialog}
+          isAdmin
+        />
+      }
     </>
   );
 }
