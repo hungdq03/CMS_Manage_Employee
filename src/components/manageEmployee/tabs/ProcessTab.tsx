@@ -1,16 +1,18 @@
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, MenuItem } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import moment from 'moment';
-import React, { ChangeEvent, MouseEvent, useLayoutEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, MouseEvent, useLayoutEffect, useState } from 'react';
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
-import { useSelector } from 'react-redux';
 import { useAppContext } from '../../../context/AppContext';
-import { useAppDispatch } from '../../../redux/hook';
-import { createSalaryThunk, selectSalaryIncreasesState, updateSalaryThunk } from '../../../redux/slices/salaryIncreaseSlice';
-import { SalaryIncrease } from '../../../types/salaryIncrease';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { selectEmployeeById } from '../../../redux/slices/employeesSlice';
+import { createProcessThunk, selectProcessesState, updateProcessThunk } from '../../../redux/slices/processSlice';
+import { RootState } from '../../../redux/store';
+import { POSITIONS } from '../../../types/employee';
+import { Process } from '../../../types/process';
 import { convertDateStringtoTime, statusCode } from '../../../utils';
-import { SalaryTable } from '../tables/SalaryTable';
-import { SalaryLetter } from '../SalaryLetter';
+import { ProcessTable } from '../tables/ProcessTable';
+import { ProcessLetter } from '../ProcessLetter';
 
 interface Props {
   employeeId: number;
@@ -18,29 +20,31 @@ interface Props {
   isEnd?: boolean;
 }
 
-export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+export const ProcessTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
-  const [salary, setSalary] = useState<SalaryIncrease>();
-  const [salariesByPage, setSalariesByPage] = useState<SalaryIncrease[]>([]);
-  const { salaryIncreases } = useSelector(selectSalaryIncreasesState);
-  const [openSalaryLetter, setOpenSalaryLetter] = useState<{
-    salaryId: number;
+  const [process, setProcess] = useState<Process>();
+  const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
+  const { processes } = useAppSelector(selectProcessesState)
+  const [processesByPage, setProcessesByPage] = useState<Process[]>([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 1,
+    pageSize: 3,
+    keyword: '',
+  });
+  const [openProcessLetter, setOpenProcessLetter] = useState<{
+    processId: number | undefined;
     isOpen: boolean;
-  }>();
-  const [pagination, setPagination] = useState(
-    {
-      pageIndex: 1,
-      pageSize: 3,
-      keyword: '',
-    }
-  )
+  }>({
+    processId: undefined,
+    isOpen: false,
+  })
 
   useLayoutEffect(() => {
     const startOfPage = (pagination.pageIndex - 1) * pagination.pageSize;
     const endOfPage = pagination.pageIndex * pagination.pageSize;
-    setSalariesByPage(salaryIncreases.data?.slice(startOfPage, endOfPage));
-  }, [pagination, salaryIncreases])
+    setProcessesByPage(processes.data?.slice(startOfPage, endOfPage));
+  }, [pagination.pageIndex, pagination.pageSize, processes.data])
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setPagination((prev) => {
@@ -65,114 +69,104 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
     const { name, value, type } = e.target;
     const formatValue = type === 'date' ? convertDateStringtoTime(value) : value
 
-    setSalary((prev: SalaryIncrease | undefined) => (
+    setProcess((prev: Process | undefined) => (
       {
         ...prev,
         [name]: formatValue
       }
-    ) as SalaryIncrease)
+    ) as Process)
   }
 
   const handleSubmit = () => {
-    if (salary?.id) {
-      dispatch(updateSalaryThunk(salary)).then(unwrapResult)
+    if (process?.id) {
+      dispatch(updateProcessThunk(process))
+        .then(unwrapResult)
         .then((res) => {
-
           if (res.code === statusCode.SUCCESS) {
-            setSalary(undefined);
-            handleOpenSalaryLetter(res.data.id)
+            setProcess(undefined);
+            handleOpenProcessLetter(res.data.id)
             showMessage({
-              message: 'Cập nhật thông tin lương thành công.',
+              message: 'Cập nhật thông tin thăng chức thành công.',
               severity: 'success',
             });
           } else {
             showMessage({
-              message: res.message || 'Cập nhật thông tin lương thất bại.',
+              message: res.message || 'Cập nhật thông tin thăng chức thất bại.',
               severity: 'error'
             });
           }
         });
-    } else if (salary) {
-      dispatch(createSalaryThunk({
+    } else if (process) {
+      dispatch(createProcessThunk({
         employeeId: employeeId, data: [{
-          ...salary,
-          oldSalary
+          ...process,
+          currentPosition: employee?.currentPosition
         }]
       }))
         .then(unwrapResult)
         .then((res) => {
           if (res.code === statusCode.SUCCESS) {
-            setSalary(undefined);
-            handleOpenSalaryLetter(res.data[0].id)
+            setProcess(undefined);
+            handleOpenProcessLetter(res.data[0].id)
             showMessage({
-              message: 'Thêm mới thông tin lương thành công.',
+              message: 'Thêm mới thông tin thăng chức thành công.',
               severity: 'success',
             });
           } else {
             showMessage({
-              message: res.message || 'Thêm mới thông tin lương thất bại.',
+              message: res.message || 'Thêm mới thông tin thăng chức thất bại.',
               severity: 'error'
             });
           }
         });
     }
   }
-
   const handleCancel = () => {
-    setSalary(undefined)
+    setProcess(undefined)
   }
 
-  const handleOpenSalaryLetter = (salaryId: number) => {
-    setOpenSalaryLetter({
-      salaryId: salaryId,
+  const handleOpenProcessLetter = (processId: number) => {
+    setOpenProcessLetter({
+      processId,
       isOpen: true,
     })
   }
 
-  const handleCloseSalaryLetter = () => {
-    setOpenSalaryLetter({
+  const handleCloseProcessLetter = () => {
+    setOpenProcessLetter({
+      processId: undefined,
       isOpen: false,
-      salaryId: 0
     })
   }
 
-  const oldSalary = useMemo(() => {
-    if (!salaryIncreases.data) {
-      return 0;
-    }
-
-    return salaryIncreases.data
-      .filter(obj => obj.salaryIncreaseStatus === 3 && obj.acceptanceDate)
-      .sort((a, b) => new Date(a.acceptanceDate!).getTime() - new Date(b.acceptanceDate!).getTime())[0]?.newSalary || 0;
-  }, [salaryIncreases.data]);
-
   return (
-    <div>
+    <>
       {!isManage && (
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container spacing={2} xs={12}>
-            <Grid item xs={4} >
+            <Grid item xs={4}>
               <TextValidator
                 fullWidth
                 label={
                   <span>
                     <span className="text-red-500">*</span>
-                    Ngày tăng lương
+                    Ngày thăng chức
                   </span>
                 }
                 type="date"
                 value={
-                  salary?.startDate
-                    ? moment(salary?.startDate).format("YYYY-MM-DD")
+                  process?.promotionDay
+                    ? moment(process?.promotionDay).format("YYYY-MM-DD")
                     : ""
                 }
-                variant="outlined"
                 disabled={isEnd}
+                variant="outlined"
                 onChange={handleChangeInput}
+                className="w-100"
                 InputLabelProps={{
                   shrink: true,
                 }}
-                name="startDate"
+                name="promotionDay"
                 validators={["required"]}
                 errorMessages="Hãy nhập trường thông tin này"
                 InputProps={{
@@ -188,20 +182,16 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                 label={
                   <span>
                     <span className="text-red-500">*</span>
-                    Mức lương cũ
+                    Vị trí hiện tại
                   </span>
                 }
                 value={
-                  oldSalary || salary?.oldSalary || ""
+                  employee?.currentPosition ? Object.values(POSITIONS)[employee?.currentPosition] : ''
                 }
-                inputProps={{
-                  readOnly:
-                    salary?.oldSalary && salary?.salaryIncreaseStatus === 4,
-                }}
                 variant="outlined"
-                onChange={handleChangeInput}
                 disabled
-                name="oldSalary"
+                className="w-100 "
+                name="currentPosition"
               />
             </Grid>
             <Grid item xs={4}>
@@ -210,47 +200,29 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                 label={
                   <span>
                     <span className="text-red-500">*</span>
-                    Mức lương mới
+                    Vị trí mới
                   </span>
                 }
-                value={salary?.newSalary || ""}
+                value={process?.newPosition || ""}
                 disabled={isEnd}
                 variant="outlined"
+                select
                 onChange={handleChangeInput}
                 className="w-100 "
-                name="newSalary"
-                validators={[
-                  "required",
-                  "matchRegexp:^\\d*$",
-                  `minNumber:${oldSalary}`,
-                ]}
-                errorMessages={[
-                  "Hãy nhập trường thông tin này",
-                  "Vui lòng nhập số",
-                  "Lương mới phải lớn hơn lương cũ",
-                ]}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextValidator
-                fullWidth
-                label={
-                  <span>
-                    <span className="text-red-500">*</span>
-                    Lý do
-                  </span>
-                }
-                value={salary?.reason || ""}
-                disabled={isEnd}
-                variant="outlined"
-                onChange={handleChangeInput}
-                className="w-100 "
-                name="reason"
+                name="newPosition"
                 validators={["required"]}
                 errorMessages="Hãy nhập trường thông tin này"
-              />
+              >
+                {Object.entries(POSITIONS)?.map(([key, value]) => {
+                  return (
+                    <MenuItem key={key} value={key}>
+                      {value}
+                    </MenuItem>
+                  );
+                })}
+              </TextValidator>
             </Grid>
+
             <Grid item xs={12}>
               <TextValidator
                 fullWidth
@@ -260,7 +232,7 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                     Ghi chú
                   </span>
                 }
-                value={salary?.note || ""}
+                value={process?.note || ""}
                 disabled={isEnd}
                 variant="outlined"
                 onChange={handleChangeInput}
@@ -268,10 +240,12 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                 name="note"
                 validators={["required"]}
                 errorMessages="Hãy nhập trường thông tin này"
+                rows={2}
+                rowsMax={10}
               />
             </Grid>
             <Grid item xs={12}>
-              <div className='w-full h-full flex justify-center items-center space-x-2'>
+              <div className='w-full flex justify-center items-center space-x-2'>
                 <Button
                   variant="contained"
                   color="primary"
@@ -295,24 +269,24 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
           </Grid>
         </ValidatorForm>
       )}
-      <div className="mt-8">
-        <SalaryTable
+      <div className="pt-20">
+        <ProcessTable
           employeeId={employeeId}
-          rows={salariesByPage}
-          count={salaryIncreases.data?.length}
+          rows={processesByPage}
+          count={processes.data?.length}
           page={pagination.pageIndex}
           rowsPerPage={pagination.pageSize}
           handleChangePage={handleChangePage}
           handleChangeRowsPerPage={handleChangeRowsPerPage}
-          setSalarySelected={setSalary} />
+          setProcessSelected={setProcess} />
       </div>
-      {openSalaryLetter &&
-        <SalaryLetter
+      {openProcessLetter && openProcessLetter.processId &&
+        <ProcessLetter
           employeeId={employeeId}
-          salaryId={openSalaryLetter?.salaryId}
-          open={openSalaryLetter?.isOpen}
-          onClose={handleCloseSalaryLetter}
+          processId={openProcessLetter?.processId}
+          open={openProcessLetter?.isOpen}
+          onClose={handleCloseProcessLetter}
         />}
-    </div>
+    </>
   )
 }

@@ -1,9 +1,9 @@
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Typography } from '@mui/material';
 import moment from 'moment';
-import React, { useLayoutEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
+import React, { useState } from 'react';
+import { useAppSelector } from '../../redux/hook';
 import { selectEmployeeById } from '../../redux/slices/employeesSlice';
-import { getSalaryIncreaseByIdThunk, selectSalaryIncreaseById } from '../../redux/slices/salaryIncreaseSlice';
+import { selectSalaryIncreaseById } from '../../redux/slices/salaryIncreaseSlice';
 import { RootState } from '../../redux/store';
 import { TabPanel } from '../../styles/theme/components/TabPanel';
 import { ACTION_PROCESS } from '../../types/process';
@@ -18,14 +18,9 @@ interface Props {
 }
 
 export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isManage, salaryId }) => {
-  const dispatch = useAppDispatch();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId));
   const salary = useAppSelector((state: RootState) => selectSalaryIncreaseById(state, salaryId));
   const [openSendingLeaderDialog, setOpenSendingLeaderDialog] = useState<boolean>(false);
-
-  useLayoutEffect(() => {
-    dispatch(getSalaryIncreaseByIdThunk(salaryId))
-  }, [dispatch, salaryId])
 
   const handleOpenSendingLeaderDialog = () => {
     setOpenSendingLeaderDialog(true)
@@ -188,6 +183,13 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                       <Typography className="italic font-bold"
                         sx={{ fontFamily: 'Times New Roman, serif' }}>
                         Nơi Nhận:
+                      </Typography>
+                      <Typography className="font-bold"
+                        sx={{ fontFamily: 'Times New Roman, serif' }}>
+                        Ông/Bà:{" "}
+                        <b>
+                          {employee?.leaderName}
+                        </b>
                       </Typography>
                       <Typography className="font-bold"
                         sx={{ fontFamily: 'Times New Roman, serif' }}>Như điều 2</Typography>

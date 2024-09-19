@@ -177,7 +177,7 @@ const processSlice = createSlice({
     });
     builder.addCase(createProcessThunk.fulfilled, (state, action) => {
       state.processStatus = 'succeeded';
-      state.processes.data.unshift(action.payload);
+      action.payload.data.map((process: Process) => state.processes.data.unshift(process));
     });
     builder.addCase(createProcessThunk.rejected, (state, action) => {
       state.processStatus = 'failed';
@@ -193,7 +193,7 @@ const processSlice = createSlice({
       state.processStatus = 'succeeded';
       const index = state.processes.data.findIndex((process) => process.id === action.payload.data.id);
       if (index !== -1) {
-        state.processes.data[index] = action.payload;
+        state.processes.data[index] = action.payload.data;
       }
     });
     builder.addCase(updateProcessThunk.rejected, (state, action) => {
