@@ -1,20 +1,20 @@
-import { AppBar, Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Tab, Tabs } from '@mui/material';
-import ConstantList from '../../../appConfig';
-import React, { useState, SyntheticEvent, ChangeEvent, useEffect, useLayoutEffect } from 'react'
-import { TabPanel } from '../../../styles/theme/components/TabPanel';
-import { ACTION_EMPLOYEE, Employee, GENDER, TAB_PROMOTED, TAB_PROPOSAL, TAB_SARALY } from '../../../types/employee';
+import { Avatar, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, Tab, Tabs } from '@mui/material';
+import React, { SyntheticEvent, useLayoutEffect, useState } from 'react';
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
-import { convertDateStringtoTime, formatDate } from '../../../utils';
-import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
-import ProfileEmployeeDialog from '../../employeeProfile/dialogs/ProfileEmployeeDialog';
-import { RootState } from '../../../redux/store';
 import { useAppDispatch, useAppSelector } from '../../../redux/hook';
 import { selectEmployeeById } from '../../../redux/slices/employeesSlice';
-import { getSalaryIncreasesByEmployeeIdThunk } from '../../../redux/slices/salaryIncreaseSlice';
-import { SalaryTab } from '../tabs/SalaryTab';
 import { getProcessesByEmployeeIdThunk } from '../../../redux/slices/processSlice';
 import { getProposalsByEmployeeIdThunk } from '../../../redux/slices/proposalSlice';
+import { getSalaryIncreasesByEmployeeIdThunk } from '../../../redux/slices/salaryIncreaseSlice';
+import { RootState } from '../../../redux/store';
+import { TabPanel } from '../../../styles/theme/components/TabPanel';
+import { ACTION_EMPLOYEE, GENDER, TAB_PROMOTED, TAB_PROPOSAL, TAB_SARALY } from '../../../types/employee';
+import { formatDate } from '../../../utils';
+import ProfileEmployeeDialog from '../../employeeProfile/dialogs/ProfileEmployeeDialog';
+import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
 import { ProcessTab } from '../tabs/ProcessTab';
+import { ProposalTab } from '../tabs/ProposalTab';
+import { SalaryTab } from '../tabs/SalaryTab';
 
 interface Props {
   employeeId: number;
@@ -217,15 +217,13 @@ export const ManageEmployeeDialog: React.FC<Props> = ({ open, onClose, isManage,
                 isEnd={isEnd}
               />
             </TabPanel>
-            {/* <TabPanel value={tab} index={TAB_PROPOSAL}>
+            <TabPanel value={tab} index={TAB_PROPOSAL}>
               <ProposalTab
-                t={t}
-                employee={employee}
-                listLeader={listLeader}
+                employeeId={employeeId}
                 isManage={isManage}
                 isEnd={isEnd}
               />
-            </TabPanel> */}
+            </TabPanel>
           </div>
         </DialogContent>
 

@@ -3,8 +3,9 @@ import moment from 'moment';
 import React, { useState } from 'react';
 import { useAppSelector } from '../../redux/hook';
 import { selectEmployeeById } from '../../redux/slices/employeesSlice';
-import { selectSalaryIncreaseById } from '../../redux/slices/salaryIncreaseSlice';
+import { selectProposalById } from '../../redux/slices/proposalSlice';
 import { RootState } from '../../redux/store';
+import { PROPOSAL_TYPE } from '../../types/employee';
 import { ACTION_PROCESS } from '../../types/process';
 import { SendingleaderDialog } from './dialogs/SendingleaderDialog';
 
@@ -12,13 +13,14 @@ interface Props {
   open: boolean;
   onClose: () => void;
   employeeId: number;
-  salaryId: number;
+  proposalId: number;
   isManage?: boolean;
 }
 
-export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isManage, salaryId }) => {
+
+export const ProposalLetter: React.FC<Props> = ({ open, onClose, employeeId, proposalId, isManage }) => {
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId));
-  const salary = useAppSelector((state: RootState) => selectSalaryIncreaseById(state, salaryId));
+  const proposal = useAppSelector((state: RootState) => selectProposalById(state, proposalId));
   const [openSendingLeaderDialog, setOpenSendingLeaderDialog] = useState<boolean>(false);
 
   const handleOpenSendingLeaderDialog = () => {
@@ -30,7 +32,7 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
   }
 
   return (
-    <div className="flex justify-center mt-8">
+    <div>
       <Dialog
         onClose={onClose}
         open={open}
@@ -38,13 +40,15 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
         fullWidth={true}
       >
         <DialogTitle>
-          Đề xuất tăng lương
+          <Grid container >
+            <Grid item>Đề xuất tham mưu</Grid>
+          </Grid>
         </DialogTitle>
 
         <DialogContent dividers>
-          <DialogContent dividers className="bg-gray-200 p-3 sm:p-12">
+          <DialogContent dividers className="bg-gray-200 p-3 md:px-10">
             <Box className="bg-white">
-              <Box className="p-10 sm:p-20">
+              <Box className="px-10 pt-10 pb-20 md:px-20">
                 <Grid container spacing={2}>
                   <Grid item xs={4}>
                     <div className="flex justify-center">
@@ -55,7 +59,7 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                     </div>
                     <Typography className="flex justify-center font-bold"
                       sx={{ fontFamily: 'Times New Roman, serif' }}>
-                      <b> Số {employee?.id}/ QĐ - TL</b>
+                      <b>Số {employee?.id}/ QĐ - TL</b>
                     </Typography>
                   </Grid>
                   <Grid item xs={8}>
@@ -66,135 +70,87 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                       </Typography>
                     </div>
                     <div className="flex justify-center">
-                      <Typography className="underline decoration-solid pb-1 mb-8 font-bold"
+                      <Typography className="underline pb-1 mb-8 font-bold"
                         sx={{ fontFamily: 'Times New Roman, serif' }}>
                         Độc lập - Tự do - Hạnh phúc
                       </Typography>
                     </div>
-                    <div className="flex justify-center">
-                      <Typography className="italic leading-10 mt-8 font-bold"
+                    <div className="flex justify-center font-bold">
+                      <Typography className="truncate leading-relaxed italic mt-8"
                         sx={{ fontFamily: 'Times New Roman, serif' }}>
                         Hà Nội, Ngày{" "}
-                        {
-                          salary?.startDate ?
-                            moment(new Date(salary?.startDate))
-                              .format("DD/MM/YYYY")
-                              .split("/")[0] : ''
-                        }{" "}
+                        {proposal?.proposalDate ?
+                          moment(new Date(proposal?.proposalDate))
+                            .format("DD/MM/YYYY")
+                            .split("/")[0] : ''}{" "}
                         tháng{" "}
-                        {
-                          salary?.startDate ?
-                            moment(new Date(salary?.startDate))
-                              .format("DD/MM/YYYY")
-                              .split("/")[1] : ''
-                        }{" "}
+                        {proposal?.proposalDate ?
+                          moment(new Date(proposal?.proposalDate))
+                            .format("DD/MM/YYYY")
+                            .split("/")[1] : ''}{" "}
                         năm{" "}
-                        {
-                          salary?.startDate ?
-                            moment(new Date(salary?.startDate))
-                              .format("DD/MM/YYYY")
-                              .split("/")[2] : ''
-                        }
+                        {proposal?.proposalDate ?
+                          moment(new Date(proposal?.proposalDate))
+                            .format("DD/MM/YYYY")
+                            .split("/")[2] : ''}
                       </Typography>
                     </div>
                   </Grid>
                 </Grid>
-
-                <Typography className="flex justify-center mt-8 font-bold"
-                  sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  QUYẾT ĐỊNH
-                </Typography>
-                <Typography className="flex justify-center pb-3 italic"
-                  sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  V/v tăng lương cho người lao động
-                </Typography>
-
-                <Typography className="font-bold"
-                  sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  - Căn cứ vào Điều lệ, nội quy, quy chế của Công ty OCEANTECH;
-                </Typography>
-
-                <Typography className="font-bold"
-                  sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  - Căn cứ vào hợp đồng số <b>{employee?.code}</b> được ký giữa Công ty OCEANTECH và Ông/Bà <b>{employee?.name}</b>{" "}
-                  ngày {moment(employee?.submitDay).format("DD")} tháng{" "}
-                  {moment(employee?.submitDay).format("MM")} năm{" "}
-                  {moment(employee?.submitDay).format("YYYY")};
-                </Typography>
-
-                <Typography className="pb-3 font-bold" sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  - Căn cứ vào sự đóng góp thực tế của Ông/Bà:{" "}
-                  <b>{employee?.name}</b> đổi với sự phát triển của Công ty OCEANTECH.
-                </Typography>
-
                 <div className="flex justify-center font-bold">
-                  <Typography className="truncate font-bold" sx={{ fontFamily: 'Times New Roman, serif' }}>
-                    GIÁM ĐỐC CÔNG TY OCEANTECH
+                  <Typography className="mt-8 mb-4 font-bold"
+                    sx={{ fontFamily: 'Times New Roman, serif' }}>
+                    ĐƠN ĐỀ XUẤT
                   </Typography>
                 </div>
-                <Typography className="flex justify-center leading-10 font-bold"
+                <Typography className="font-bold text-center"
                   sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  QUYẾT ĐỊNH
+                  <b>Kính gửi:</b> - Ban giám đốc Công ty OCEANTECH
                 </Typography>
-
-                <Typography className="font-bold" sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  <b>- Điều 1:</b> Tăng lương cho Ông/Bà: <b>{employee?.name}</b> đang làm việc tại công ty kể từ ngày{" "}
-                  {salary?.startDate ?
-                    moment(new Date(salary?.startDate))
-                      .format("DD/MM/YYYY")
-                      .split("/")[0] : ''
-                  }{" "}
-                  tháng{" "}
-                  {
-                    salary?.startDate ?
-                      moment(new Date(salary?.startDate))
-                        .format("DD/MM/YYYY")
-                        .split("/")[1] : ''
-                  }{" "}
-                  năm{" "}
-                  {
-                    salary?.startDate ?
-                      moment(new Date(salary?.startDate))
-                        .format("DD/MM/YYYY")
-                        .split("/")[2] : ''
-                  }, cụ thể như sau:
-                </Typography>
-
                 <Typography className="font-bold"
                   sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  Mức lương hiện tại: <b>{salary?.oldSalary?.toLocaleString()} VND</b>
+                  Tôi tên là <b>{employee?.name}</b>, hiện đang làm nhân viên IT của Công ty OCEANTECH
                 </Typography>
-
                 <Typography className="font-bold"
                   sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  Mức lương sau điều chỉnh: <b>{salary?.newSalary?.toLocaleString()} VND</b>
+                  Hôm nay tôi viết đơn này{" "}
+                  <b>
+                    {proposal?.type ? Object.values(PROPOSAL_TYPE)[proposal?.type] : ''}
+                  </b>
                 </Typography>
-
                 <Typography className="font-bold"
                   sx={{ fontFamily: 'Times New Roman, serif' }}>
-                  <b>- Điều 2: </b>Các Ông/Bà Phòng nhân sự, Phòng tài chính kế toán và Ông/Bà:{" "}
-                  <b>{employee?.leaderName}</b> căn cứ thi hành quyết định này.
+                  Trong quá trình làm việc tại Công ty OCEANTECH, tôi nhận thấy đề xuất của tôi giúp cải thiện
                 </Typography>
-
+                <Typography className="font-bold"
+                  sx={{ fontFamily: 'Times New Roman, serif' }}>
+                  {" "}
+                  - Giúp cải thiện được năng suất làm việc, tinh thần thoải mái.
+                </Typography>
+                <Typography className="font-bold"
+                  sx={{ fontFamily: 'Times New Roman, serif' }}>
+                  {" "}
+                  - Tạo một không gian lành mạnh, cạnh tranh cao trong công việc.
+                </Typography>
+                <Typography className="font-bold"
+                  sx={{ fontFamily: 'Times New Roman, serif' }}>
+                  Tôi viết đơn này mong ban lãnh đạo Công ty OCEANTECH, xem xét đề xuất của tôi.
+                </Typography>
+                <Typography className="font-bold"
+                  sx={{ fontFamily: 'Times New Roman, serif' }}>
+                  Xin trân trọng cảm ơn!
+                </Typography>
                 <Box className="flex justify-between mt-8 font-bold">
-                  <Box className="px-8 mt-3">
-                    <Typography className="italic font-bold"
-                      sx={{ fontFamily: 'Times New Roman, serif' }}>
-                      Nơi Nhận:
-                    </Typography>
+                  <Box className="mt-3 font-bold">
+                    <Typography className="font-bold italic"
+                      sx={{ fontFamily: 'Times New Roman, serif' }}>Nơi Nhận:</Typography>
                     <Typography className="font-bold"
                       sx={{ fontFamily: 'Times New Roman, serif' }}>
-                      Ông/Bà:{" "}
-                      <b>
-                        {employee?.leaderName}
-                      </b>
-                    </Typography>
-                    <Typography className="font-bold"
-                      sx={{ fontFamily: 'Times New Roman, serif' }}>Như điều 2</Typography>
+                      Cơ quan, tổ chức, cá nhân liên quan</Typography>
                     <Typography className="font-bold"
                       sx={{ fontFamily: 'Times New Roman, serif' }}>Lưu HS,VP</Typography>
                   </Box>
-                  <Box className="px-8">
+                  <Box>
                     <div className="flex flex-col items-center text-center w-full font-times-serif">
                       <div className="flex justify-center">
                         <Typography
@@ -207,7 +163,7 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                       <h4 className="font-bold uppercase text-[17px] font-times">Giám đốc</h4>
                       <span className="font-times italic text-[17px] mb-5">(Ký tên, đóng dấu)</span>
                     </div>
-                    {salary?.salaryIncreaseStatus === 3 && (
+                    {proposal?.proposalStatus === 3 && (
                       <div className="mt-3 flex justify-center font-bold">
                         <span className="sign-text font-bold">
                           {employee?.leaderName}
@@ -222,13 +178,13 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
         </DialogContent>
 
         <DialogActions>
-          <div className="text-center m-auto space-x-2">
+          <div className="text-center mx-auto space-x-2">
             {isManage ? (
               <>
                 <Button
                   variant="contained"
                   color="primary"
-                  className="mr-12"
+                  className="mr-3"
                 // onClick={() => handleDialogApproved()}
                 >
                   Phê duyệt
@@ -236,7 +192,7 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                 <Button
                   variant="contained"
                   color="primary"
-                  className="mr-12"
+                  className="mr-3"
                 // onClick={() => handleDialogAddRequest()}
                 >
                   Yêu cầu bổ sung
@@ -244,20 +200,18 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                 <Button
                   variant="contained"
                   color="primary"
-                  className="mr-12"
+                  className="mr-3"
                 // onClick={() => handleDialogReasonRefusalDialog()}
                 >
                   Từ chối
                 </Button>
               </>
             ) : (
-              !ACTION_PROCESS.MANAGE.includes(salary?.salaryIncreaseStatus?.toString() ?? '') &&
-              (
+              !ACTION_PROCESS.MANAGE.includes(proposal?.proposalStatus.toString() ?? '') && (
                 <Button
                   variant="contained"
                   color="primary"
-                  type="button"
-                  className="mr-12"
+                  className="mr-3"
                   onClick={() => handleOpenSendingLeaderDialog()}
                 >
                   Gửi lãnh đạo
@@ -267,7 +221,6 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
             <Button
               variant="contained"
               color="error"
-              type="button"
               onClick={onClose}
             >
               Hủy
@@ -276,12 +229,48 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
         </DialogActions>
       </Dialog>
 
-      {salary?.id &&
+      {proposal?.id &&
         <SendingleaderDialog
-          id={salary?.id}
-          type='SALARY'
+          id={proposal?.id}
+          type='PROPOSAL'
           open={openSendingLeaderDialog}
           onClose={handleCloseSendingLeaderDialog} />}
+
+      {/* {showDialogApproved && (
+        <ApprovalDialog
+          t={t}
+          open={showDialogApproved}
+          handleClose={handleDialogApprovedClose}
+          handleCloseProfile={handleClose}
+          employee={employee}
+          proposal={proposal}
+          isProposal={true}
+        />
+      )} */}
+
+      {/* {showDialogAddRequest && (
+        <AddRequestDialog
+          t={t}
+          open={showDialogAddRequest}
+          handleClose={handleDialogAddRequestClose}
+          handleCloseProfile={handleClose}
+          employee={employee}
+          isProposal={true}
+          proposal={proposal}
+        />
+      )} */}
+
+      {/* {showDialogReasonRefusalDialog && (
+        <ReasonRefusalDialog
+          t={t}
+          open={showDialogReasonRefusalDialog}
+          handleClose={handleDialogReasonRefusalDialogClose}
+          handleCloseProfile={handleClose}
+          employee={employee}
+          isProposal={true}
+          proposal={proposal}
+        />
+      )} */}
     </div>
   )
 }

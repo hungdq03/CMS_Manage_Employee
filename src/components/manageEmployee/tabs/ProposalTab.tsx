@@ -1,16 +1,16 @@
-import { Button, Grid } from '@mui/material';
+import { Button, Grid, MenuItem } from '@mui/material';
 import { unwrapResult } from '@reduxjs/toolkit';
 import moment from 'moment';
-import React, { ChangeEvent, MouseEvent, useLayoutEffect, useMemo, useState } from 'react';
+import React, { ChangeEvent, MouseEvent, useLayoutEffect, useState } from 'react';
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
-import { useSelector } from 'react-redux';
 import { useAppContext } from '../../../context/AppContext';
-import { useAppDispatch } from '../../../redux/hook';
-import { createSalaryThunk, selectSalaryIncreasesState, updateSalaryThunk } from '../../../redux/slices/salaryIncreaseSlice';
-import { SalaryIncrease } from '../../../types/salaryIncrease';
+import { useAppDispatch, useAppSelector } from '../../../redux/hook';
+import { createNewProposalThunk, selectProposalsState, updateProposalThunk } from '../../../redux/slices/proposalSlice';
+import { PROPOSAL } from '../../../types/employee';
+import { Proposal } from '../../../types/proposal';
 import { convertDateStringtoTime, statusCode } from '../../../utils';
-import { SalaryTable } from '../tables/SalaryTable';
-import { SalaryLetter } from '../SalaryLetter';
+import { ProposalLetter } from '../ProposalLetter';
+import { ProposalTable } from '../tables/ProposalTable';
 
 interface Props {
   employeeId: number;
@@ -18,29 +18,31 @@ interface Props {
   isEnd?: boolean;
 }
 
-export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+export const ProposalTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
-  const [salary, setSalary] = useState<SalaryIncrease>();
-  const [salariesByPage, setSalariesByPage] = useState<SalaryIncrease[]>([]);
-  const { salaryIncreases } = useSelector(selectSalaryIncreasesState);
-  const [openSalaryLetter, setOpenSalaryLetter] = useState<{
-    salaryId: number;
+  const [proposal, setProposal] = useState<Proposal>();
+  const { proposals } = useAppSelector(selectProposalsState)
+  const [proposalsByPage, setProposalsByPage] = useState<Proposal[]>([]);
+  const [pagination, setPagination] = useState({
+    pageIndex: 1,
+    pageSize: 3,
+    keyword: '',
+  });
+  const [openProposalLetter, setOpenProposalLetter] = useState<{
+    proposalId: number | undefined;
     isOpen: boolean;
-  }>();
-  const [pagination, setPagination] = useState(
-    {
-      pageIndex: 1,
-      pageSize: 3,
-      keyword: '',
-    }
-  )
+  }>({
+    proposalId: undefined,
+    isOpen: false,
+  })
 
   useLayoutEffect(() => {
     const startOfPage = (pagination.pageIndex - 1) * pagination.pageSize;
     const endOfPage = pagination.pageIndex * pagination.pageSize;
-    setSalariesByPage(salaryIncreases.data?.slice(startOfPage, endOfPage));
-  }, [pagination, salaryIncreases])
+    setProposalsByPage(proposals.data?.slice(startOfPage, endOfPage));
+  }, [pagination.pageIndex, pagination.pageSize, proposals.data])
 
   const handleChangeRowsPerPage = (event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
     setPagination((prev) => {
@@ -65,192 +67,153 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
     const { name, value, type } = e.target;
     const formatValue = type === 'date' ? convertDateStringtoTime(value) : value
 
-    setSalary((prev: SalaryIncrease | undefined) => (
+    setProposal((prev: Proposal | undefined) => (
       {
         ...prev,
         [name]: formatValue
       }
-    ) as SalaryIncrease)
+    ) as Proposal)
   }
 
   const handleSubmit = () => {
-    if (salary?.id) {
-      dispatch(updateSalaryThunk(salary)).then(unwrapResult)
+    if (proposal?.id) {
+      dispatch(updateProposalThunk(proposal))
+        .then(unwrapResult)
         .then((res) => {
-
           if (res.code === statusCode.SUCCESS) {
-            setSalary(undefined);
-            handleOpenSalaryLetter(res.data.id)
+            setProposal(undefined);
+            handleOpenProposalLetter(res.data.id)
             showMessage({
-              message: 'Cập nhật thông tin lương thành công.',
+              message: 'Cập nhật thông tin thăng chức thành công.',
               severity: 'success',
             });
           } else {
             showMessage({
-              message: res.message || 'Cập nhật thông tin lương thất bại.',
+              message: res.message || 'Cập nhật thông tin thăng chức thất bại.',
               severity: 'error'
             });
           }
         });
-    } else if (salary) {
-      dispatch(createSalaryThunk({
+    } else if (proposal) {
+      dispatch(createNewProposalThunk({
         employeeId: employeeId, data: [{
-          ...salary,
-          oldSalary
+          ...proposal,
         }]
       }))
         .then(unwrapResult)
         .then((res) => {
           if (res.code === statusCode.SUCCESS) {
-            setSalary(undefined);
-            handleOpenSalaryLetter(res.data[0].id)
+            setProposal(undefined);
+            handleOpenProposalLetter(res.data[0].id)
             showMessage({
-              message: 'Thêm mới thông tin lương thành công.',
+              message: 'Thêm mới thông tin thăng chức thành công.',
               severity: 'success',
             });
           } else {
             showMessage({
-              message: res.message || 'Thêm mới thông tin lương thất bại.',
+              message: res.message || 'Thêm mới thông tin thăng chức thất bại.',
               severity: 'error'
             });
           }
         });
     }
   }
-
   const handleCancel = () => {
-    setSalary(undefined)
+    setProposal(undefined)
   }
 
-  const handleOpenSalaryLetter = (salaryId: number) => {
-    setOpenSalaryLetter({
-      salaryId: salaryId,
+  const handleOpenProposalLetter = (proposalId: number) => {
+    setOpenProposalLetter({
+      proposalId,
       isOpen: true,
     })
   }
 
-  const handleCloseSalaryLetter = () => {
-    setOpenSalaryLetter({
+  const handleCloseProposalLetter = () => {
+    setOpenProposalLetter({
+      proposalId: undefined,
       isOpen: false,
-      salaryId: 0
     })
   }
 
-  const oldSalary = useMemo(() => {
-    if (!salaryIncreases.data) {
-      return 0;
-    }
-
-    return salaryIncreases.data
-      .filter(obj => obj.salaryIncreaseStatus === 3 && obj.acceptanceDate)
-      .sort((a, b) => new Date(a.acceptanceDate!).getTime() - new Date(b.acceptanceDate!).getTime())[0]?.newSalary || 0;
-  }, [salaryIncreases.data]);
-
   return (
-    <div>
+    <>
       {!isManage && (
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container spacing={2} xs={12}>
-            <Grid item xs={4} >
+            <Grid item xs={4}>
               <TextValidator
                 fullWidth
                 label={
                   <span>
                     <span className="text-red-500">*</span>
-                    Ngày tăng lương
+                    Ngày đề xuất
                   </span>
                 }
                 type="date"
                 value={
-                  salary?.startDate
-                    ? moment(salary?.startDate).format("YYYY-MM-DD")
+                  proposal?.proposalDate
+                    ? moment(proposal?.proposalDate).format("YYYY-MM-DD")
                     : ""
                 }
-                variant="outlined"
                 disabled={isEnd}
+                variant="outlined"
                 onChange={handleChangeInput}
+                className="w-100"
                 InputLabelProps={{
                   shrink: true,
                 }}
-                name="startDate"
-                validators={["required"]}
-                errorMessages="Hãy nhập trường thông tin này"
                 InputProps={{
                   inputProps: {
                     min: moment().format("YYYY-MM-DD"),
                   },
                 }}
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextValidator
-                fullWidth
-                label={
-                  <span>
-                    <span className="text-red-500">*</span>
-                    Mức lương cũ
-                  </span>
-                }
-                value={
-                  oldSalary || salary?.oldSalary || ""
-                }
-                inputProps={{
-                  readOnly:
-                    salary?.oldSalary && salary?.salaryIncreaseStatus === 4,
-                }}
-                variant="outlined"
-                onChange={handleChangeInput}
-                disabled
-                name="oldSalary"
-              />
-            </Grid>
-            <Grid item xs={4}>
-              <TextValidator
-                fullWidth
-                label={
-                  <span>
-                    <span className="text-red-500">*</span>
-                    Mức lương mới
-                  </span>
-                }
-                value={salary?.newSalary || ""}
-                disabled={isEnd}
-                variant="outlined"
-                onChange={handleChangeInput}
-                className="w-100 "
-                name="newSalary"
-                validators={[
-                  "required",
-                  "matchRegexp:^\\d*$",
-                  `minNumber:${oldSalary}`,
-                ]}
-                errorMessages={[
-                  "Hãy nhập trường thông tin này",
-                  "Vui lòng nhập số",
-                  "Lương mới phải lớn hơn lương cũ",
-                ]}
-              />
-            </Grid>
-
-            <Grid item xs={12}>
-              <TextValidator
-                fullWidth
-                label={
-                  <span>
-                    <span className="text-red-500">*</span>
-                    Lý do
-                  </span>
-                }
-                value={salary?.reason || ""}
-                disabled={isEnd}
-                variant="outlined"
-                onChange={handleChangeInput}
-                className="w-100 "
-                name="reason"
+                name="proposalDate"
                 validators={["required"]}
                 errorMessages="Hãy nhập trường thông tin này"
               />
             </Grid>
+            <Grid item xs={4}>
+              <TextValidator
+                fullWidth
+                label={<span>Loại đề xuất</span>}
+                select
+                value={proposal?.type || ""}
+                disabled={isEnd}
+                variant="outlined"
+                onChange={handleChangeInput}
+                className="w-100"
+                name="type"
+              >
+                {Object.entries(PROPOSAL)?.map(([key, value]) => {
+                  return (
+                    <MenuItem value={key} key={key}>
+                      {value}
+                    </MenuItem>
+                  );
+                })}
+              </TextValidator>
+            </Grid>
+            <Grid item xs={4}>
+              <TextValidator
+                fullWidth
+                label={
+                  <span>
+                    <span className="text-red-500">*</span>
+                    Nội dung
+                  </span>
+                }
+                value={proposal?.content || ""}
+                disabled={isEnd}
+                variant="outlined"
+                onChange={handleChangeInput}
+                className="w-100 "
+                name="content"
+                validators={["required"]}
+                errorMessages="Hãy nhập trường thông tin này"
+              />
+            </Grid>
+
             <Grid item xs={12}>
               <TextValidator
                 fullWidth
@@ -260,7 +223,7 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                     Ghi chú
                   </span>
                 }
-                value={salary?.note || ""}
+                value={proposal?.note || ""}
                 disabled={isEnd}
                 variant="outlined"
                 onChange={handleChangeInput}
@@ -270,8 +233,32 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
                 errorMessages="Hãy nhập trường thông tin này"
               />
             </Grid>
+
             <Grid item xs={12}>
-              <div className='w-full h-full flex justify-center items-center space-x-2'>
+              <TextValidator
+                fullWidth
+                label={
+                  <span>
+                    <span className="text-red-500">*</span>
+                    Mô tả chi tiết
+                  </span>
+                }
+                value={proposal?.detailedDescription || ""}
+                disabled={isEnd}
+                variant="outlined"
+                onChange={handleChangeInput}
+                className="w-100 "
+                name="detailedDescription"
+                validators={["required"]}
+                errorMessages="Hãy nhập trường thông tin này"
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              className="text-center mt-auto"
+            >
+              <div className='m-auto space-x-2'>
                 <Button
                   variant="contained"
                   color="primary"
@@ -295,25 +282,26 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
           </Grid>
         </ValidatorForm>
       )}
-      <div className="mt-8">
-        <SalaryTable
+
+      <div className="pt-20">
+        <ProposalTable
           employeeId={employeeId}
-          rows={salariesByPage}
-          count={salaryIncreases.data?.length}
+          rows={proposalsByPage}
+          count={proposals.data?.length}
           page={pagination.pageIndex}
           rowsPerPage={pagination.pageSize}
           handleChangePage={handleChangePage}
           handleChangeRowsPerPage={handleChangeRowsPerPage}
-          setSalarySelected={setSalary} />
+          setProposalSelected={setProposal} />
       </div>
 
-      {openSalaryLetter &&
-        <SalaryLetter
+      {openProposalLetter?.proposalId &&
+        <ProposalLetter
           employeeId={employeeId}
-          salaryId={openSalaryLetter?.salaryId}
-          open={openSalaryLetter?.isOpen}
-          onClose={handleCloseSalaryLetter}
+          proposalId={openProposalLetter?.proposalId}
+          open={openProposalLetter?.isOpen}
+          onClose={handleCloseProposalLetter}
         />}
-    </div>
+    </>
   )
 }

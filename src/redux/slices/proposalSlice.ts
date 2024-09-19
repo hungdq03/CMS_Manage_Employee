@@ -173,7 +173,7 @@ const proposalSlice = createSlice({
     });
     builder.addCase(createNewProposalThunk.fulfilled, (state, action) => {
       state.proposalStatus = 'succeeded';
-      state.proposals.data.push(action.payload);
+      action.payload.data.map((proposal: Proposal) => state.proposals.data.unshift(proposal));
     });
     builder.addCase(createNewProposalThunk.rejected, (state, action) => {
       state.proposalStatus = 'failed';
@@ -189,7 +189,7 @@ const proposalSlice = createSlice({
       state.proposalStatus = 'succeeded';
       const index = state.proposals.data.findIndex((proposal) => proposal.id === action.payload.data.id);
       if (index !== -1) {
-        state.proposals.data[index] = action.payload;
+        state.proposals.data[index] = action.payload.data;
       }
     });
     builder.addCase(updateProposalThunk.rejected, (state, action) => {
