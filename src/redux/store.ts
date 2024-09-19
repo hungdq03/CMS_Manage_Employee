@@ -6,6 +6,10 @@ import certificateReducer from './slices/certificateSlice';
 import familyReducer from './slices/familySlice';
 import experienceReducer from './slices/experienceSlice';
 import leadersReducer from './slices/leaderSlice';
+import processReducer from './slices/processSlice';
+import proposalReducer from './slices/proposalSlice';
+import registeredDocumentReducer from './slices/registeredDocumentSlice';
+import salaryIncreaseReducer from './slices/salaryIncreaseSlice';
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +19,11 @@ export const store = configureStore({
     certificates: certificateReducer,
     families: familyReducer,
     experiences: experienceReducer,
-    leaders: leadersReducer
+    leaders: leadersReducer,
+    processes: processReducer,
+    proposals: proposalReducer,
+    registeredDocuments: registeredDocumentReducer,
+    salaryIncreases: salaryIncreaseReducer,
   },
 });
 

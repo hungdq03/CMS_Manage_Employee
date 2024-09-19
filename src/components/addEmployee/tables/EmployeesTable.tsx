@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Bell, Eye, Files } from '@phosphor-icons/react';
+import { Bell, Eye, Files, PencilSimple } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useAppDispatch } from '../../../redux/hook';
 import { deleteEmployeeThunk } from '../../../redux/slices/employeesSlice';
@@ -21,6 +21,8 @@ import ProfileEmployeeDialog from '../../employeeProfile/dialogs/ProfileEmployee
 import { unwrapResult } from '@reduxjs/toolkit';
 import { useAppContext } from '../../../context/AppContext';
 import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
+import { ManageEmployeeDialog } from '../../manageEmployee/dialogs/ManageEmployeeDialog';
+import ShowDialog from '../../core/ShowDialog';
 
 interface Props {
   count?: number;
@@ -28,8 +30,9 @@ interface Props {
   rows?: Employee[];
   rowsPerPage?: number;
   onChangeParams: (state: Partial<paramsSearchEmployees>) => void;
-  isAdmin?: boolean;
   isEnd?: boolean;
+  isManage?: boolean;
+  isAdmin?: boolean;
 }
 
 export function EmployeesTable({
@@ -38,8 +41,9 @@ export function EmployeesTable({
   page = 1,
   rowsPerPage = 0,
   onChangeParams,
-  isAdmin,
-  isEnd
+  isEnd,
+  isManage,
+  isAdmin
 }: Props): React.JSX.Element {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
@@ -50,6 +54,14 @@ export function EmployeesTable({
   const [openRegisnationDialog, setOpenRegisnationDialog] = useState<{
     isOpen: boolean;
     employeeId: number;
+  }>();
+  const [openManageEmployeeDialog, setOpenManageEmployeeDialog] = useState<{
+    isOpen: boolean;
+    employeeId: number;
+  }>();
+  const [openNotify, setOpenNotify] = useState<{
+    employee: Employee | undefined;
+    isOpen: boolean;
   }>();
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
@@ -108,6 +120,33 @@ export function EmployeesTable({
     })
   }
 
+  const handleOpenManageEmployeeDialog = (employeeId: number) => {
+    setOpenManageEmployeeDialog({
+      employeeId,
+      isOpen: true
+    })
+  }
+
+  const handleCloseManageEmployeeDialog = () => {
+    setOpenManageEmployeeDialog({
+      employeeId: 0,
+      isOpen: false
+    })
+  }
+
+  const handleOpenNotify = (employee: Employee) => {
+    setOpenNotify({
+      employee,
+      isOpen: true
+    })
+  }
+
+  const handleCloseNotify = () => {
+    setOpenNotify({
+      employee: undefined,
+      isOpen: false
+    })
+  }
 
   return (
     <>
@@ -153,8 +192,18 @@ export function EmployeesTable({
                       </IconButton>
                     </TableCell>
                     : <TableCell align='center'>
-                      {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus.toString() ?? '') && (
-                        <EmployeeDialog type='UPDATE' employeeId={row.id} />
+                      {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus?.toString() ?? '') && (
+                        isManage ? (
+                          <IconButton
+                            color="primary"
+                            onClick={() => handleOpenManageEmployeeDialog(row.id)}
+                            size="small"
+                          >
+                            <PencilSimple />
+                          </IconButton>
+                        ) : (
+                          <EmployeeDialog type="UPDATE" employeeId={row.id} />
+                        )
                       )}
 
                       {ACTION_EMPLOYEE.DELETE.includes(row.submitProfileStatus.toString() ?? '') && (
@@ -183,6 +232,7 @@ export function EmployeesTable({
                         <IconButton
                           color="secondary"
                           size='small'
+                          onClick={() => handleOpenNotify(row)}
                         >
                           <Bell color='#ddb903' />
                         </IconButton>
@@ -225,7 +275,7 @@ export function EmployeesTable({
           employeeId={openProfile?.employeeId}
           isOpenDialog={openProfile?.isOpen}
           handleCloseDialog={handleCloseProfile}
-          isAdmin={isAdmin}
+          isManage={isManage}
           isEnd={isEnd}
         />}
       {
@@ -234,9 +284,35 @@ export function EmployeesTable({
           employeeId={openRegisnationDialog?.employeeId}
           open={openRegisnationDialog?.isOpen}
           onClose={handleCloseRegisnationDialog}
-          isAdmin
+          isManage
         />
       }
+
+      {
+        openManageEmployeeDialog &&
+        <ManageEmployeeDialog
+          open={openManageEmployeeDialog?.isOpen}
+          onClose={handleCloseManageEmployeeDialog}
+          employeeId={openManageEmployeeDialog?.employeeId} />
+      }
+
+      {openNotify && (
+        <ShowDialog
+          onConfirmDialogClose={handleCloseNotify}
+          open={openNotify.isOpen}
+          text={
+            openNotify.employee?.submitProfileStatus.toString() === "4"
+              ? openNotify.employee?.additionalRequest || "Không có"
+              : openNotify.employee?.reasonForRejection || "Không có"
+          }
+          title={
+            openNotify.employee?.submitProfileStatus.toString() === "4"
+              ? "Nội dung yêu cầu bổ sung"
+              : "Lý do từ chối"
+          }
+          cancel='Hủy'
+        />
+      )}
     </>
   );
 }

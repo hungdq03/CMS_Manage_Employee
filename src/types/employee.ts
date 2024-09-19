@@ -23,7 +23,7 @@ export type Employee = {
   activity?: string | null;
   skill?: string | null;
   submitProfileStatus: number;
-  currentPosition?: number | null;
+  currentPosition?: number;
   employeeFamilyDtos?: Family[] | null;
   certificatesDto?: Certificate[] | null;
   ethnic?: string | null;

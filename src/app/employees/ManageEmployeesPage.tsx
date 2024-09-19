@@ -58,6 +58,7 @@ const ManageEmployeesPage = () => {
           rows={employees.data}
           rowsPerPage={params.pageSize}
           onChangeParams={onChangeParams}
+          isManage
         />
       </Stack>
     </Fragment>

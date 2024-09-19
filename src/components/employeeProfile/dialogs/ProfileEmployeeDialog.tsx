@@ -22,11 +22,11 @@ interface Props {
   employeeId: number;
   isOpenDialog: boolean;
   handleCloseDialog: () => void;
-  isAdmin?: boolean;
+  isManage?: boolean;
   isEnd?: boolean
 }
 
-const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isAdmin, isEnd }) => {
+const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isManage, isEnd }) => {
   const [tab, setTab] = useState(0);
   const dispatch = useAppDispatch();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
@@ -93,7 +93,6 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
       >
         <DialogTitle>Hồ sơ nhân viên</DialogTitle>
 
-
         <DialogContent dividers>
           <div className={isMobile ? 'flex-col' : 'flex'}>
             <Tabs
@@ -151,7 +150,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                     open={openResignationLetter}
                     onClose={handleCloseResignationLetter}
                     employeeId={employeeId}
-                    isAdmin={isAdmin}
+                    isManage={isManage}
                   />
                 </TabPanel>
               }
@@ -174,7 +173,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                   </Button>
                 </div>
               )}
-            {isAdmin &&
+            {isManage &&
               (ACTION_EMPLOYEE.PENDING_END.includes(
                 employee?.submitProfileStatus.toString() ?? ''
               ) ||
@@ -189,7 +188,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                   Lịch sử cập nhật
                 </Button>
               )}
-            {isAdmin &&
+            {isManage &&
               ACTION_EMPLOYEE.PENDING.includes(employee?.submitProfileStatus.toString() ?? '') && (
                 <>
                   <Button

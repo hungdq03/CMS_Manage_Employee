@@ -9,6 +9,10 @@ import { selectCertificateState } from '../redux/slices/certificateSlice';
 import { selectFamilyState } from '../redux/slices/familySlice';
 import { selectExperienceState } from '../redux/slices/experienceSlice';
 import { selectCurrentUser } from '../redux/slices/userSlice';
+import { selectProcessesState } from '../redux/slices/processSlice';
+import { selectProposalsState } from '../redux/slices/proposalSlice';
+import { selectRegisteredDocumentsState } from '../redux/slices/registeredDocumentSlice';
+import { selectSalaryIncreasesState } from '../redux/slices/salaryIncreaseSlice';
 
 type SnackbarMessage = {
   message: string;
@@ -47,6 +51,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   const { certificateStatus } = useAppSelector(selectCertificateState);
   const { familyStatus } = useAppSelector(selectFamilyState);
   const { experienceStatus } = useAppSelector(selectExperienceState);
+  const { processStatus } = useAppSelector(selectProcessesState);
+  const { proposalStatus } = useAppSelector(selectProposalsState);
+  const { documentStatus } = useAppSelector(selectRegisteredDocumentsState);
+  const { salaryStatus } = useAppSelector(selectSalaryIncreasesState);
+
   const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
@@ -101,7 +110,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         || employeeStatus === 'loading'
         || certificateStatus === 'loading'
         || familyStatus === 'loading'
-        || experienceStatus === 'loading' ? (
+        || experienceStatus === 'loading'
+        || processStatus === 'loading'
+        || proposalStatus === 'loading'
+        || documentStatus === 'loading'
+        || salaryStatus === 'loading' ? (
         <Loader />
       ) : null}
     </AppContext.Provider>
