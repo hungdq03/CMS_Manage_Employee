@@ -361,7 +361,7 @@ const CvTab: React.FC<Props> = ({ employeeId }) => {
             }
           </div>
           {experiences != null &&
-            experiences.data.map((experience) => (
+            experiences.data?.map((experience) => (
               <div className='my-3'>
                 <div className='font-bold text-xl flex items-center gap-2'>
                   <span className="tracking-wide">

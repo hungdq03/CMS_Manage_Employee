@@ -222,4 +222,4 @@ const salaryIncreaseSlice = createSlice({
 export default salaryIncreaseSlice.reducer;
 export const selectSalaryIncreasesState = (state: RootState) => state.salaryIncreases;
 export const selectSalaryIncreaseById = (state: RootState, salaryIncreaseId: number) =>
-  state.salaryIncreases.salaryIncreases.data.find((salaryIncrease) => salaryIncrease.id === salaryIncreaseId);
+  state.salaryIncreases.salaryIncreases.data?.find((salaryIncrease) => salaryIncrease.id === salaryIncreaseId);

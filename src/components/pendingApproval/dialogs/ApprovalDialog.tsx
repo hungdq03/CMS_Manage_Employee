@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid } from '@mui/material'
 import moment from 'moment'
 import React, { ChangeEvent, useEffect, useState } from 'react'
@@ -9,64 +10,120 @@ import { convertDateStringtoTime, statusCode } from '../../../utils'
 import { Employee } from '../../../types/employee'
 import { useAppContext } from '../../../context/AppContext'
 import { unwrapResult } from '@reduxjs/toolkit';
+import { selectSalaryIncreaseById, updateSalaryThunk } from '../../../redux/slices/salaryIncreaseSlice'
+import { selectProposalById, updateProposalThunk } from '../../../redux/slices/proposalSlice'
+import { selectProcessById, updateProcessThunk } from '../../../redux/slices/processSlice'
+import { SalaryIncrease } from '../../../types/salaryIncrease'
+import { Proposal } from '../../../types/proposal'
+import { Process } from '../../../types/process'
 
 
 interface Props {
   open: boolean,
   onClose: () => void,
   isRegister?: boolean,
-  isSalary?: boolean,
-  isProposal?: boolean,
-  isPromote?: boolean,
-  employeeId: number,
+  salaryId?: number,
+  proposalId?: number,
+  processId?: number,
+  employeeId?: number,
 }
 
-export const ApprovalDialog: React.FC<Props> = ({ open, onClose, employeeId, isRegister, isPromote, isProposal, isSalary }) => {
+type ApprovalObjectType = Employee | SalaryIncrease | Proposal | Process | undefined;
+
+export const ApprovalDialog: React.FC<Props> = ({ open, onClose, employeeId, isRegister, processId, proposalId, salaryId }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
-  const employeeSelected = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
-  const [employee, setEmployee] = useState<Employee>();
+
+  let selectorFn: ((state: RootState) => ApprovalObjectType) | undefined;
+
+  if (employeeId) {
+    selectorFn = (state: RootState) => selectEmployeeById(state, employeeId);
+  } else if (salaryId) {
+    selectorFn = (state: RootState) => selectSalaryIncreaseById(state, salaryId);
+  } else if (proposalId) {
+    selectorFn = (state: RootState) => selectProposalById(state, proposalId);
+  } else if (processId) {
+    selectorFn = (state: RootState) => selectProcessById(state, processId);
+  }
+
+  const approvalObject: ApprovalObjectType = useAppSelector(selectorFn ?? (() => undefined));
+
+  const [approvalState, setApprovalState] = useState<ApprovalObjectType>();
 
   useEffect(() => {
-    setEmployee(employeeSelected)
-  }, [employeeSelected])
+    setApprovalState(approvalObject)
+  }, [approvalObject])
 
   const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     const formatValue = type === 'date' ? convertDateStringtoTime(value) : value
 
-    setEmployee((prev: Employee | undefined) => (
+    setApprovalState((prev: ApprovalObjectType) => (
       {
         ...prev,
         [name]: formatValue
       }
-    ) as Employee)
+    ) as ApprovalObjectType)
   }
 
   const handleSubmit = () => {
-    if (employee) {
-      const data: Employee = {
-        ...employee,
-        submitProfileStatus: 3
+    if (approvalObject) {
+      let data: any;
+      let updateThunk: any;
+
+      if (employeeId) {
+        data = {
+          ...approvalState,
+          submitProfileStatus: 3
+        };
+        updateThunk = updateEmployeeThunk;
+      } else if (salaryId) {
+        data = {
+          ...approvalState,
+          salaryIncreaseStatus: 3,
+        };
+        updateThunk = updateSalaryThunk;
+      } else if (proposalId) {
+        data = {
+          ...approvalState,
+          proposalStatus: 3,
+        };
+        updateThunk = updateProposalThunk;
+      } else if (processId) {
+        data = {
+          ...approvalState,
+          processStatus: 3,
+        };
+        updateThunk = updateProcessThunk;
       }
 
-      dispatch(updateEmployeeThunk(data)).then(unwrapResult)
-        .then((res) => {
-          if (res.code === statusCode.SUCCESS) {
+      if (updateThunk) {
+        dispatch(updateThunk(data))
+          .then(unwrapResult)
+          .then((res: { code: number; message: string }) => {
+            if (res.code === statusCode.SUCCESS) {
+              showMessage({
+                message: `Cập nhật thông tin thành công`,
+                severity: 'success',
+              });
+              onClose();
+            } else {
+              showMessage({
+                message: res.message ?? `Cập nhật thông tin thất bại`,
+                severity: 'error',
+              });
+            }
+          })
+          .catch((error: { message: string }) => {
             showMessage({
-              message: `Cập nhật thông tin thành công`,
-              severity: 'success'
-            })
-            onClose()
-          } else {
-            showMessage({
-              message: res.message ?? `Cập nhật thông tin thất bại`,
-              severity: 'error'
-            })
-          }
-        })
+              message: `Cập nhật thông tin thất bại: ${error.message}`,
+              severity: 'error',
+            });
+          });
+      }
     }
   };
+
 
   return (
     <Dialog
@@ -101,11 +158,11 @@ export const ApprovalDialog: React.FC<Props> = ({ open, onClose, employeeId, isR
                 name={
                   isRegister
                     ? "appointmentDate"
-                    : isSalary
+                    : salaryId
                       ? "acceptanceDate"
-                      : isProposal
+                      : proposalId
                         ? "acceptanceDate"
-                        : isPromote
+                        : processId
                           ? "acceptanceDate"
                           : ""
                 }
