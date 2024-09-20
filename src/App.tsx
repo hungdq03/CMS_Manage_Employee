@@ -1,35 +1,81 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { Provider } from 'react-redux';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { ThemeProvider } from './components/core/themeProvider/ThemeProvider';
+import MainLayout from './components/layouts/MainLayout';
+import { AppContextProvider } from './context/AppContext';
+import AuthGuard from './app/auth/AuthGuard';
+import { SignInPage } from './app/auth/SignInPage';
+import AddEmployeePage from './app/employees/AddEmployeePage';
+import ManageEmployeesPage from './app/employees/ManageEmployeesPage';
+import { store } from './redux/store';
+import { paths } from './paths';
+import NotFoundPage from './app/errors/NotFoundPage';
+import { AuthRole } from './types/user';
+import { ForbiddenPage } from './app/errors/ForbiddenPage';
+import { PendingApprovalPage } from './app/leader/PendingApprovalPage';
+import EndEmployeePage from './app/employees/EndEmployeePage';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Provider store={store}>
+      <AppContextProvider>
+        <ThemeProvider>
+          <Router>
+            <Routes>
+              <Route path={paths.auth.signIn}
+                element={
+                  <AuthGuard>
+                    <SignInPage />
+                  </AuthGuard>
+                } />
+              <Route path={paths.home}
+                element={
+                  <AuthGuard>
+                    <MainLayout />
+                  </AuthGuard>
+                }>
+                <Route
+                  path={paths.dashboard.employees.add}
+                  element={
+                    <AuthGuard allowedRoles={AuthRole.user}>
+                      <AddEmployeePage />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path={paths.dashboard.employees.manage}
+                  element={
+                    <AuthGuard allowedRoles={AuthRole.user}>
+                      <ManageEmployeesPage />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path={paths.dashboard.employees.end}
+                  element={
+                    <AuthGuard allowedRoles={AuthRole.user}>
+                      <EndEmployeePage />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path={paths.dashboard.leader.pendingApproval}
+                  element={
+                    <AuthGuard allowedRoles={AuthRole.admin}>
+                      <PendingApprovalPage />
+                    </AuthGuard>
+                  }
+                />
+              </Route>
+              <Route path={paths.errors.forbidden} element={<ForbiddenPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Router>
+        </ThemeProvider>
+      </AppContextProvider>
+    </Provider>
+  );
+};
 
-export default App
+export default App;
