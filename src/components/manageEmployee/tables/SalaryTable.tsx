@@ -136,15 +136,13 @@ export const SalaryTable: React.FC<Props> = ({ employeeId, count, page, rows, ro
                       </IconButton>
                     )}
 
-                    {ACTION_PROCESS.VIEW.includes(row.salaryIncreaseStatus?.toString() ?? '') && (
-                      <IconButton
-                        size="small"
-                        color="secondary"
-                        onClick={() => handleOpenSalaryLetter(row.id)}
-                      >
-                        <Eye color='green' />
-                      </IconButton>
-                    )}
+                    <IconButton
+                      size="small"
+                      color="secondary"
+                      onClick={() => handleOpenSalaryLetter(row.id)}
+                    >
+                      <Eye color='green' />
+                    </IconButton>
 
                     {ACTION_PROCESS.NOTIFY.includes(row.salaryIncreaseStatus?.toString() ?? '') && (
                       <IconButton

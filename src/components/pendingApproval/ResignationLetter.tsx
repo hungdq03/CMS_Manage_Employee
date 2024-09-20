@@ -15,10 +15,10 @@ interface Props {
   open: boolean;
   onClose: () => void;
   employeeId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean;
 }
-export const ResignationLetter: React.FC<Props> = ({ open, onClose, employeeId, isManage, isEnd }) => {
+export const ResignationLetter: React.FC<Props> = ({ open, onClose, employeeId, isAdmin, isEnd }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
@@ -250,7 +250,7 @@ export const ResignationLetter: React.FC<Props> = ({ open, onClose, employeeId, 
         </DialogContent>
         <DialogActions>
           <div className="text-center m-auto space-x-4">
-            {isManage ? (
+            {isAdmin ? (
               <>
                 <Button
                   variant="contained"

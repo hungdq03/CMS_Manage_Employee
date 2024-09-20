@@ -14,6 +14,7 @@ import NotFoundPage from './app/errors/NotFoundPage';
 import { AuthRole } from './types/user';
 import { ForbiddenPage } from './app/errors/ForbiddenPage';
 import { PendingApprovalPage } from './app/leader/PendingApprovalPage';
+import EndEmployeePage from './app/employees/EndEmployeePage';
 
 const App: React.FC = () => {
   return (
@@ -47,6 +48,14 @@ const App: React.FC = () => {
                   element={
                     <AuthGuard allowedRoles={AuthRole.user}>
                       <ManageEmployeesPage />
+                    </AuthGuard>
+                  }
+                />
+                <Route
+                  path={paths.dashboard.employees.end}
+                  element={
+                    <AuthGuard allowedRoles={AuthRole.user}>
+                      <EndEmployeePage />
                     </AuthGuard>
                   }
                 />

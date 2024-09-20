@@ -8,7 +8,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import { Bell, Eye, Files, PencilSimple } from '@phosphor-icons/react';
+import { Bell, Eye, Files, FloppyDisk, PencilSimple } from '@phosphor-icons/react';
 import * as React from 'react';
 import { useAppDispatch } from '../../../redux/hook';
 import { deleteEmployeeThunk } from '../../../redux/slices/employeesSlice';
@@ -23,6 +23,7 @@ import { useAppContext } from '../../../context/AppContext';
 import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
 import { ManageEmployeeDialog } from '../../manageEmployee/dialogs/ManageEmployeeDialog';
 import ShowDialog from '../../core/ShowDialog';
+import { EndEmployeeDialog } from '../../endEmployee/EndEmployeeDialog';
 
 interface Props {
   count?: number;
@@ -63,6 +64,10 @@ export function EmployeesTable({
     employee: Employee | undefined;
     isOpen: boolean;
   }>();
+  const [openEndDialog, setOpenEndDialog] = useState<{
+    employeeId: number;
+    isOpen: boolean;
+  }>()
 
   const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     if (event) {
@@ -148,6 +153,20 @@ export function EmployeesTable({
     })
   }
 
+  const handleOpenEndDialog = (employeeId: number) => {
+    setOpenEndDialog({
+      employeeId,
+      isOpen: true
+    })
+  }
+
+  const handleCloseEndDialog = () => {
+    setOpenEndDialog({
+      employeeId: 0,
+      isOpen: false
+    })
+  }
+
   return (
     <>
       <Card>
@@ -170,74 +189,105 @@ export function EmployeesTable({
             <TableBody>
               {rows.map((row, index) => (
                 <TableRow key={row.id}>
-                  {isAdmin ?
-                    <TableCell>
-                      {ACTION_EMPLOYEE.END.includes(row.submitProfileStatus.toString() ?? '') &&
-                        <IconButton
-                          color="secondary"
-                          size='small'
-                          onClick={() => handleOpenProfile(row.id)}
-                        >
-                          <Eye color='green' />
-                        </IconButton>
-                      }
-                      <IconButton
-                        color="secondary"
-                        size='small'
-                        onClick={() => ACTION_EMPLOYEE.PENDING_END.includes(row.submitProfileStatus.toString() ?? '') ? handleOpenRegisnationDialog(row.id) :
-                          handleOpenProfile(row.id)
-                        }
-                      >
-                        <Files color='blue' />
-                      </IconButton>
-                    </TableCell>
-                    : <TableCell align='center'>
-                      {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus?.toString() ?? '') && (
-                        isManage ? (
+                  <TableCell align={isAdmin ? undefined : 'center'}>
+                    {isAdmin && (
+                      <>
+                        {ACTION_EMPLOYEE.END.includes(row.submitProfileStatus.toString() ?? '') && (
                           <IconButton
-                            color="primary"
-                            onClick={() => handleOpenManageEmployeeDialog(row.id)}
-                            size="small"
+                            color="secondary"
+                            size='small'
+                            onClick={() => handleOpenProfile(row.id)}
                           >
-                            <PencilSimple />
+                            <Eye color='green' />
                           </IconButton>
-                        ) : (
-                          <EmployeeDialog type="UPDATE" employeeId={row.id} />
-                        )
-                      )}
-
-                      {ACTION_EMPLOYEE.DELETE.includes(row.submitProfileStatus.toString() ?? '') && (
-                        <ConfirmationDialog
-                          onYesClick={() => handleDeleteEmployee(row.id)}
-                          title="Xác nhận"
-                          text={`Bạn có chắc chắn muốn xóa nhân viên: ${row.name}`}
-                          Yes="Xác nhận"
-                          No="Hủy"
-                          btnColor='error'
-                          iconName='Trash'
-                        />
-                      )}
-
-                      {ACTION_EMPLOYEE.VIEW.includes(row.submitProfileStatus.toString() ?? '') && (
+                        )}
                         <IconButton
                           color="secondary"
                           size='small'
-                          onClick={() => handleOpenProfile(row.id)}
+                          onClick={() =>
+                            ACTION_EMPLOYEE.PENDING_END.includes(row.submitProfileStatus.toString() ?? '')
+                              ? handleOpenRegisnationDialog(row.id)
+                              : handleOpenProfile(row.id)
+                          }
+                        >
+                          <Files color='blue' />
+                        </IconButton>
+                      </>
+                    )}
+
+                    {!isAdmin && (
+                      <>
+                        {ACTION_EMPLOYEE.EDIT.includes(row.submitProfileStatus?.toString() ?? '') && (
+                          isManage ? (
+                            <IconButton
+                              color="primary"
+                              onClick={() => handleOpenManageEmployeeDialog(row.id)}
+                              size="small"
+                            >
+                              <PencilSimple />
+                            </IconButton>
+                          ) : (
+                            <EmployeeDialog type="UPDATE" employeeId={row.id} />
+                          )
+                        )}
+
+                        {ACTION_EMPLOYEE.DELETE.includes(row.submitProfileStatus.toString() ?? '') && (
+                          <ConfirmationDialog
+                            onYesClick={() => handleDeleteEmployee(row.id)}
+                            title="Xác nhận"
+                            text={`Bạn có chắc chắn muốn xóa nhân viên: ${row.name}`}
+                            Yes="Xác nhận"
+                            No="Hủy"
+                            btnColor='error'
+                            iconName='Trash'
+                          />
+                        )}
+
+                        {ACTION_EMPLOYEE.VIEW.includes(row.submitProfileStatus.toString() ?? '') && (
+                          <IconButton
+                            color="secondary"
+                            size='small'
+                            onClick={() => handleOpenProfile(row.id)}
+                          >
+                            <Eye color='green' />
+                          </IconButton>
+                        )}
+
+                        {ACTION_EMPLOYEE.NOTIFY.includes(row.submitProfileStatus.toString() ?? '') && (
+                          <IconButton
+                            color="secondary"
+                            size='small'
+                            onClick={() => handleOpenNotify(row)}
+                          >
+                            <Bell color='#ddb903' />
+                          </IconButton>
+                        )}
+                      </>
+                    )}
+
+                    {
+                      isEnd &&
+                      <>
+                        <IconButton
+                          size='small'
+                          color="secondary"
+                          onClick={() => handleOpenManageEmployeeDialog(row.id)}
                         >
                           <Eye color='green' />
                         </IconButton>
-                      )}
+                        {ACTION_EMPLOYEE.END.includes(row.submitProfileStatus.toString() ?? '') && (
+                          <IconButton
+                            size='small'
+                            color="primary"
+                            onClick={() => handleOpenEndDialog(row.id)}
+                          >
+                            <FloppyDisk />
+                          </IconButton>
+                        )}
+                      </>
+                    }
+                  </TableCell>
 
-                      {ACTION_EMPLOYEE.NOTIFY.includes(row.submitProfileStatus.toString() ?? '') && (
-                        <IconButton
-                          color="secondary"
-                          size='small'
-                          onClick={() => handleOpenNotify(row)}
-                        >
-                          <Bell color='#ddb903' />
-                        </IconButton>
-                      )}
-                    </TableCell>}
 
 
                   <TableCell>{page !== 1 ? (page - 1) * rowsPerPage + index + 1 : index + 1}</TableCell>
@@ -275,7 +325,7 @@ export function EmployeesTable({
           employeeId={openProfile?.employeeId}
           isOpenDialog={openProfile?.isOpen}
           handleCloseDialog={handleCloseProfile}
-          isManage={isManage}
+          isAdmin={isAdmin}
           isEnd={isEnd}
         />}
       {
@@ -284,7 +334,8 @@ export function EmployeesTable({
           employeeId={openRegisnationDialog?.employeeId}
           open={openRegisnationDialog?.isOpen}
           onClose={handleCloseRegisnationDialog}
-          isManage
+          isAdmin={isAdmin}
+          isEnd={isEnd}
         />
       }
 
@@ -293,7 +344,16 @@ export function EmployeesTable({
         <ManageEmployeeDialog
           open={openManageEmployeeDialog?.isOpen}
           onClose={handleCloseManageEmployeeDialog}
-          employeeId={openManageEmployeeDialog?.employeeId} />
+          employeeId={openManageEmployeeDialog?.employeeId}
+          isEnd={isEnd}
+          isAdmin={isAdmin} />
+      }
+
+      {openEndDialog &&
+        <EndEmployeeDialog
+          employeeId={openEndDialog.employeeId}
+          open={openEndDialog.isOpen}
+          onClose={handleCloseEndDialog} />
       }
 
       {openNotify && (

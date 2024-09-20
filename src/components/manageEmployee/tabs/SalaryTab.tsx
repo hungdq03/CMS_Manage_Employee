@@ -14,11 +14,11 @@ import { SalaryLetter } from '../SalaryLetter';
 
 interface Props {
   employeeId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean;
 }
 
-export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+export const SalaryTab: React.FC<Props> = ({ employeeId, isAdmin, isEnd }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const [salary, setSalary] = useState<SalaryIncrease>();
@@ -148,7 +148,7 @@ export const SalaryTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
 
   return (
     <div>
-      {!isManage && (
+      {!isAdmin && (
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container spacing={2} xs={12}>
             <Grid item xs={4} >

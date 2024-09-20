@@ -16,11 +16,11 @@ import { ProcessLetter } from '../ProcessLetter';
 
 interface Props {
   employeeId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean;
 }
 
-export const ProcessTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+export const ProcessTab: React.FC<Props> = ({ employeeId, isAdmin, isEnd }) => {
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
   const [process, setProcess] = useState<Process>();
@@ -141,7 +141,7 @@ export const ProcessTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => 
 
   return (
     <>
-      {!isManage && (
+      {!isAdmin && (
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container spacing={2} xs={12}>
             <Grid item xs={4}>

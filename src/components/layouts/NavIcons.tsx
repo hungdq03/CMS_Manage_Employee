@@ -20,7 +20,7 @@ export const navIcons = {
   users: UsersIcon,
   'add-employee': UserCirclePlus,
   'manage-employees': UserList,
-  'fired-employee': UserCircleMinus,
+  'end-employee': UserCircleMinus,
   'pending-approval': Hourglass,
   'approved': SuitcaseSimple
 
