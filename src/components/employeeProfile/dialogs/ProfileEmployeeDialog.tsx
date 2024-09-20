@@ -17,16 +17,17 @@ import { ResignationLetter } from '../../pendingApproval/ResignationLetter';
 import { ApprovalDialog } from '../../pendingApproval/dialogs/ApprovalDialog';
 import { AddRequestDialog } from '../../pendingApproval/dialogs/AddRequestDialog';
 import { ReasonRefusalDialog } from '../../pendingApproval/dialogs/ReasonRefusalDialog';
+import { ManageEmployeeDialog } from '../../manageEmployee/dialogs/ManageEmployeeDialog';
 
 interface Props {
   employeeId: number;
   isOpenDialog: boolean;
   handleCloseDialog: () => void;
-  isManage?: boolean;
   isEnd?: boolean
+  isAdmin?: boolean
 }
 
-const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isManage, isEnd }) => {
+const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, handleCloseDialog, isAdmin, isEnd }) => {
   const [tab, setTab] = useState(0);
   const dispatch = useAppDispatch();
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId))
@@ -36,6 +37,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
   const [openApprovalDialog, setOpenApprovalDialog] = useState<boolean>(false);
   const [openAddRequestDialog, setOpenAddRequestDialog] = useState<boolean>(false);
   const [openReasonRefusalDialog, setOpenReasonRefusalDialog] = useState<boolean>(false);
+  const [openManageEmployeeDialog, setOpenManageEmployeeDialog] = useState<boolean>();
 
   useLayoutEffect(() => {
     dispatch(getFamiliesByEmployeeThunk(employeeId))
@@ -81,6 +83,14 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
 
   const handleCloseReasonRefusalDialog = () => {
     setOpenReasonRefusalDialog(false)
+  }
+
+  const handleOpenManageEmployeeDialog = () => {
+    setOpenManageEmployeeDialog(true)
+  }
+
+  const handleCloseManageEmployeeDialog = () => {
+    setOpenManageEmployeeDialog(false)
   }
 
   return (
@@ -150,7 +160,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                     open={openResignationLetter}
                     onClose={handleCloseResignationLetter}
                     employeeId={employeeId}
-                    isManage={isManage}
+                    isAdmin={isAdmin}
                   />
                 </TabPanel>
               }
@@ -173,7 +183,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                   </Button>
                 </div>
               )}
-            {isManage &&
+            {isAdmin &&
               (ACTION_EMPLOYEE.PENDING_END.includes(
                 employee?.submitProfileStatus.toString() ?? ''
               ) ||
@@ -184,11 +194,12 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
                   variant="contained"
                   color="primary"
                   type="button"
+                  onClick={handleOpenManageEmployeeDialog}
                 >
                   Lịch sử cập nhật
                 </Button>
               )}
-            {isManage &&
+            {isAdmin &&
               ACTION_EMPLOYEE.PENDING.includes(employee?.submitProfileStatus.toString() ?? '') && (
                 <>
                   <Button
@@ -252,6 +263,17 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
         employeeId={employeeId}
         isRegister={true}
       />
+
+      {
+        openManageEmployeeDialog &&
+        <ManageEmployeeDialog
+          open={openManageEmployeeDialog}
+          onClose={handleCloseManageEmployeeDialog}
+          employeeId={employeeId}
+          isAdmin
+          isEnd
+        />
+      }
     </>
   )
 }

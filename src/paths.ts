@@ -11,7 +11,7 @@ export const paths = {
     employees: {
       add: `${constantList.ROOT_PATH}employees/add`,
       manage: `${constantList.ROOT_PATH}employees/manage`,
-      fired: `${constantList.ROOT_PATH}employees/fired`,
+      end: `${constantList.ROOT_PATH}employees/end`,
     },
     leader: {
       pendingApproval: `${constantList.ROOT_PATH}leader/pending-approval`,

@@ -16,8 +16,8 @@ export const navItems = [
         href: paths.dashboard.employees.manage, icon: 'manage-employees', role: AuthRole.user
       },
       {
-        key: 'fired', title: 'Kết thúc nhân viên',
-        href: paths.dashboard.employees.fired, icon: 'fired-employee', role: AuthRole.user
+        key: 'end', title: 'Kết thúc nhân viên',
+        href: paths.dashboard.employees.end, icon: 'end-employee', role: AuthRole.user
       },
     ],
   },

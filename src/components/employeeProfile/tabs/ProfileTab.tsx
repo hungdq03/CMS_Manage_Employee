@@ -197,7 +197,7 @@ export const ProfileTab: React.FC<Props> = ({ employeeId }) => {
                   </TableRow>
                 </TableHead>
                 <TableBody className='font-sreif'>
-                  {families.data.map((family, index) => (
+                  {families?.data?.map((family, index) => (
                     <TableRow key={family?.id}>
                       <TableCell sx={{
                         border: '1px solid black',

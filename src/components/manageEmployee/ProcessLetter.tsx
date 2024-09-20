@@ -14,10 +14,10 @@ interface Props {
   onClose: () => void;
   employeeId: number;
   processId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
 }
 
-export const ProcessLetter: React.FC<Props> = ({ open, onClose, employeeId, processId, isManage }) => {
+export const ProcessLetter: React.FC<Props> = ({ open, onClose, employeeId, processId, isAdmin }) => {
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId));
   const process = useAppSelector((state: RootState) => selectProcessById(state, processId));
   const [openSendingLeaderDialog, setOpenSendingLeaderDialog] = useState<boolean>(false);
@@ -233,7 +233,7 @@ export const ProcessLetter: React.FC<Props> = ({ open, onClose, employeeId, proc
         </DialogContent>
         <DialogActions>
           <div className="text-center m-auto space-x-2">
-            {isManage ? (
+            {isAdmin ? (
               <>
                 <Button
                   variant="contained"

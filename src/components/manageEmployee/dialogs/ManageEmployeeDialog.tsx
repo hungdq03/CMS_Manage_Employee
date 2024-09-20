@@ -20,11 +20,11 @@ interface Props {
   employeeId: number;
   open: boolean;
   onClose: () => void;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean;
 }
 
-export const ManageEmployeeDialog: React.FC<Props> = ({ open, onClose, isManage, isEnd, employeeId }) => {
+export const ManageEmployeeDialog: React.FC<Props> = ({ open, onClose, isAdmin, isEnd, employeeId }) => {
   const dispatch = useAppDispatch();
   const [tab, setTab] = useState(0);
   const [openProfileDialog, setOpenProfileDialog] = useState<boolean>(false);
@@ -206,21 +206,21 @@ export const ManageEmployeeDialog: React.FC<Props> = ({ open, onClose, isManage,
             <TabPanel value={tab} index={TAB_SARALY}>
               <SalaryTab
                 employeeId={employeeId}
-                isManage={isManage}
+                isAdmin={isAdmin}
                 isEnd={isEnd}
               />
             </TabPanel>
             <TabPanel value={tab} index={TAB_PROMOTED}>
               <ProcessTab
                 employeeId={employeeId}
-                isManage={isManage}
+                isAdmin={isAdmin}
                 isEnd={isEnd}
               />
             </TabPanel>
             <TabPanel value={tab} index={TAB_PROPOSAL}>
               <ProposalTab
                 employeeId={employeeId}
-                isManage={isManage}
+                isAdmin={isAdmin}
                 isEnd={isEnd}
               />
             </TabPanel>

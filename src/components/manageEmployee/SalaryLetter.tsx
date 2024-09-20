@@ -251,7 +251,10 @@ export const SalaryLetter: React.FC<Props> = ({ open, onClose, employeeId, isMan
                 </Button>
               </>
             ) : (
-              !ACTION_PROCESS.MANAGE.includes(salary?.salaryIncreaseStatus?.toString() ?? '') &&
+              !ACTION_PROCESS.MANAGE.includes(salary?.salaryIncreaseStatus?.toString() ?? '')
+              &&
+              ACTION_PROCESS.EDIT.includes(salary?.salaryIncreaseStatus?.toString() ?? '')
+              &&
               (
                 <Button
                   variant="contained"

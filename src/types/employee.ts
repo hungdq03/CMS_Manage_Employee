@@ -42,7 +42,7 @@ export type Employee = {
   endDay?: number | null;
   reasonForEnding?: string | null;
   numberSaved?: string | null;
-  decisionDay?: number | null;
+  decisionDay?: string | null;
   leaderId?: number | null;
 };
 

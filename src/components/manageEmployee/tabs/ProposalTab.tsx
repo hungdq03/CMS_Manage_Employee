@@ -14,11 +14,11 @@ import { ProposalTable } from '../tables/ProposalTable';
 
 interface Props {
   employeeId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
   isEnd?: boolean;
 }
 
-export const ProposalTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) => {
+export const ProposalTab: React.FC<Props> = ({ employeeId, isAdmin, isEnd }) => {
 
   const dispatch = useAppDispatch();
   const { showMessage } = useAppContext();
@@ -138,7 +138,7 @@ export const ProposalTab: React.FC<Props> = ({ employeeId, isManage, isEnd }) =>
 
   return (
     <>
-      {!isManage && (
+      {!isAdmin && (
         <ValidatorForm onSubmit={handleSubmit}>
           <Grid container spacing={2} xs={12}>
             <Grid item xs={4}>

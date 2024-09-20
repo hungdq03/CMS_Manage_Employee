@@ -14,11 +14,11 @@ interface Props {
   onClose: () => void;
   employeeId: number;
   proposalId: number;
-  isManage?: boolean;
+  isAdmin?: boolean;
 }
 
 
-export const ProposalLetter: React.FC<Props> = ({ open, onClose, employeeId, proposalId, isManage }) => {
+export const ProposalLetter: React.FC<Props> = ({ open, onClose, employeeId, proposalId, isAdmin }) => {
   const employee = useAppSelector((state: RootState) => selectEmployeeById(state, employeeId));
   const proposal = useAppSelector((state: RootState) => selectProposalById(state, proposalId));
   const [openSendingLeaderDialog, setOpenSendingLeaderDialog] = useState<boolean>(false);
@@ -179,7 +179,7 @@ export const ProposalLetter: React.FC<Props> = ({ open, onClose, employeeId, pro
 
         <DialogActions>
           <div className="text-center mx-auto space-x-2">
-            {isManage ? (
+            {isAdmin ? (
               <>
                 <Button
                   variant="contained"
