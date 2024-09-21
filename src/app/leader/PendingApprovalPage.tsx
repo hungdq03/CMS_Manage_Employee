@@ -1,13 +1,13 @@
-import React, { SyntheticEvent, useState } from 'react'
-import { TAB_PENDING_PROMOTED, TAB_PENDING_PROPOSAL, TAB_PENDING_REGISTER, TAB_PENDING_SARALY } from '../../types/employee'
-import { AppBar, Tab, Tabs } from '@mui/material'
-import { TabPanel } from '../../styles/theme/components/TabPanel';
+import { AppBar, Tab, Tabs } from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
 import { PendingRegisterTab } from '../../components/pendingApproval/tabs/PendingRegisterTab';
+import { TabPanel } from '../../styles/theme/components/TabPanel';
+import { TAB_PENDING_REGISTER } from '../../types/employee';
 
 export const PendingApprovalPage = () => {
   const [tab, setTab] = useState(0);
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setTab(newValue);
   }
 

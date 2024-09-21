@@ -55,6 +55,7 @@ export const PendingRegisterTab = () => {
           rowsPerPage={params.pageSize}
           onChangeParams={onChangeParams}
           isAdmin
+          isManage
         />
       </Stack>
     </>

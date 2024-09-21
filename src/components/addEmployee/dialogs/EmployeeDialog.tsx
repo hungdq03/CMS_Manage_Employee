@@ -77,7 +77,7 @@ const EmployeeDialog: React.FC<Props> = ({ employeeId, type }) => {
     setShowProfile(false);
   };
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     if (newValue !== TAB_EMPLOYEE) {
       if (employee?.id) {
         setTab(newValue);

@@ -45,7 +45,7 @@ const ProfileEmployeeDialog: React.FC<Props> = ({ employeeId, isOpenDialog, hand
     dispatch(getExperiencesByEmployeeThunk(employeeId))
   }, [dispatch, employeeId])
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setTab(newValue);
   }
 

@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react'
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import React from 'react';
 import { useAppSelector } from '../../../redux/hook';
 import { selectCertificateState } from '../../../redux/slices/certificateSlice';
-import { Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'
 import { formatDate } from '../../../utils';
 
 interface Props {
   employeeId: number;
 }
 
-export const CertificateProfileTab: React.FC<Props> = ({ employeeId }) => {
+export const CertificateProfileTab: React.FC<Props> = () => {
   const { certificates } = useAppSelector(selectCertificateState)
 
   return (

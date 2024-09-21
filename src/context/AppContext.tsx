@@ -77,7 +77,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
   };
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
+    _?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
     if (reason === 'clickaway') {

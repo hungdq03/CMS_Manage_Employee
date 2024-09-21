@@ -54,7 +54,7 @@ export const ProposalTab: React.FC<Props> = ({ employeeId, isAdmin, isEnd }) => 
     })
   };
 
-  const handleChangePage = (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPagination((prev) => {
       return {
         ...prev,

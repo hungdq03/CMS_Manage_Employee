@@ -37,7 +37,7 @@ export const ManageEmployeeDialog: React.FC<Props> = ({ open, onClose, isAdmin, 
     dispatch(getProposalsByEmployeeIdThunk(employeeId));
   }, [dispatch, employeeId])
 
-  const handleChangeTab = (event: SyntheticEvent, newValue: number) => {
+  const handleChangeTab = (_: SyntheticEvent, newValue: number) => {
     setTab(newValue);
   }
 

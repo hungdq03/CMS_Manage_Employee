@@ -98,7 +98,7 @@ const CertificateTab: React.FC<Props> = ({ employeeId }) => {
     })
   };
 
-  const handleChangePage = (event: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+  const handleChangePage = (_: MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPagination((prev) => {
       return {
         ...prev,

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { ReactNode, useEffect, useLayoutEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '../../redux/hook';
-import { signOut } from '../../redux/slices/authSlice';
-import { fetchCurrentUser, selectCurrentUser } from '../../redux/slices/userSlice';
-import Cookies from 'js-cookie';
-import { paths } from '../../paths';
 import { unwrapResult } from '@reduxjs/toolkit';
+import Cookies from 'js-cookie';
+import React, { ReactNode, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { paths } from '../../paths';
+import { useAppDispatch } from '../../redux/hook';
+import { signOut } from '../../redux/slices/authSlice';
+import { fetchCurrentUser } from '../../redux/slices/userSlice';
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -16,7 +16,6 @@ interface AuthGuardProps {
 const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const currentUser = useAppSelector(selectCurrentUser)
   const token = Cookies.get('token');
 
   useEffect(() => {
